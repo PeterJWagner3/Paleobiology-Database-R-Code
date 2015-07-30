@@ -1,5 +1,5 @@
 # short script to download the data with the paleobioDB api
-# can't decide if I want to use Bapst's scrtipt or the ones in paleobioDB package
+# can't decide if I want to use Bapst's script or the ones in paleobioDB package
 # I don't want to use either! just use api directly
 library(magrittr)
 library(dplyr)
