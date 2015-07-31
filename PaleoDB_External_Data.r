@@ -1,3 +1,5 @@
+#rw: this is a test  
+
 get_country_code<-function(country)
 {
   if (country=="Andorra")  { 	code<-"AD"	
