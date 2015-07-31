@@ -1,3 +1,4 @@
+# fixed name
 clear_na_from_matrix<-function(data, replacement)  {
   size<-dim(data)
   for (i in 1:size[1])	{
