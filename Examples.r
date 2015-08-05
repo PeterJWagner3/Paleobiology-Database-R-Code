@@ -95,3 +95,11 @@ taxon<-"Cetacea"
 file_format<-".xls"
 # this finds all taxa for which the last opinion places it in an invalid (junior synonym, nomen whateverum, etc.) taxon.
 find_taxa_assigned_to_invalid_higher_taxon(taxon,file_format)
+
+
+taxon<-c("Mollusca","Arthropoda","Brachiopoda","Anthozoa","Porifera","Echinodermata")
+oldest<-"Norian"
+youngest<-"Norian"
+today<-"2015-08-04"
+file_format<-".xls"
+paleodb_vett_formations(taxon,oldest,youngest,today,file_format)

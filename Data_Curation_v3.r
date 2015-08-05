@@ -370,6 +370,7 @@ paleodb_find_gaps<-function(taxon,oldest,youngest,signif_gap,file_format)
 		write.table(output1,filename1,sep=",",eol="\n",row.names=FALSE)
 }
 
+# Collect information about rock units to make stratigraphy consistent
 paleodb_vett_formations<-function(taxon,oldest,youngest,today,file_format)
 {
 	# get temporal information for search
@@ -386,8 +387,19 @@ paleodb_vett_formations<-function(taxon,oldest,youngest,today,file_format)
 		print("Error! ",youngest," is not a term in our chronostratigraphic lexicon!")
 	}
 	
-	http<-paste("http://paleobiodb.org/data1.1/colls/list.txt?base_name=",taxon,"&max_ma=",start_ma,"&min_ma=",end_ma,"&show=time,stratext,crmod&limit=all",sep="")
+	request<-paste("base_name=",as.character(taxon[1]),sep="")
+	gr<-length(taxon)
+	if (gr>1)	{
+		for (t in 2:gr)	{
+			request<-paste(request,"&base_name=",sep="")
+			request<-paste(request,as.character(taxon[t]),sep="")
+			}
+		}
+	
+#	http<-paste("http://paleobiodb.org/data1.1/colls/list.txt?base_name=",taxon,"&max_ma=",start_ma,"&min_ma=",end_ma,"&show=time,stratext,crmod&limit=all",sep="")
+	http<-paste("http://paleobiodb.org/data1.1/colls/list.txt?",request,"&max_ma=",start_ma,"&min_ma=",end_ma,"&show=time,stratext,crmod&limit=all",sep="")
 	collections <-read.table(http, sep=',', header=T)
+	collections<-clear_na_from_matrix(collections, "")
 	lists<-dim(collections)[1]
 	mid_age<-(collections$early_age+collections$late_age)/2
 	collections<-cbind(collections,mid_age)
@@ -404,7 +416,7 @@ paleodb_vett_formations<-function(taxon,oldest,youngest,today,file_format)
 	for (i in 1:dim(collections)[2])	{
 		collections[,i] <- gsub("â€œ","",collections[,i])
 		collections[,i] <- gsub("â€\u009d","",collections[,i])
-	}
+		}
 	
 	rock_unit<-paste(collections$formation,collections$member,sep=" - ")
 	rock_unit <- gsub(", NA", "",rock_unit)
@@ -431,14 +443,14 @@ paleodb_vett_formations<-function(taxon,oldest,youngest,today,file_format)
 		if (sum(as.numeric(reduced_collections[c,]!=reduced_collections[d,]))>0 && reduced_collections[c,1]!=" - ")	{
 			formation_info<-rbind(formation_info,reduced_collections[c,])
 			k<-k+1		
-		}	# end case of rock units with different information
-	}	# end search for unique lists
+			}	# end case of rock units with different information
+		}	# end search for unique lists
 	
 	if (oldest!=youngest)	{
 		time_range<-paste(oldest,"-",youngest,sep="")
-	} else {
+		} else {
 		time_range<-oldest
-	}
+		}
 	
 	filename1<-paste("Rock_Unit_Information",taxon,time_range,sep="_")
 	filename1<-paste(filename1,file_format,sep="")
@@ -509,11 +521,11 @@ if (file_format!=".csv")	{
     write.table(collection_info,filename2,sep="\t",eol="\n",row.names=FALSE)
     write.table(occurrences,filename3,sep="\t",eol="\n",row.names=FALSE)
   }
- if (file_format==".csv")	{
-    write.table(recordless_taxa,filename1,sep=",",eol="\n",row.names=FALSE)
-    write.table(collection_info,filename2,sep=",",eol="\n",row.names=FALSE)
-    write.table(occurrences,filename3,sep=",",eol="\n",row.names=FALSE)
- }
+if (file_format==".csv")	{
+	write.table(recordless_taxa,filename1,sep=",",eol="\n",row.names=FALSE)
+	write.table(collection_info,filename2,sep=",",eol="\n",row.names=FALSE)
+	write.table(occurrences,filename3,sep=",",eol="\n",row.names=FALSE)
+ 	}
 }
 
 
