@@ -484,3 +484,44 @@ if (file_format!=".csv")	{
   write.table(taxonomy,filename,sep=",",eol="\n",row.names=FALSE)
   }
 }
+
+get_references_for_collections<-function(collections,project_name)
+{
+N<-length(collections)
+#http://paleobiodb.org/data1.2/occs/list.txt?coll_id=50068&show=ref
+#http://paleobiodb.org/data1.2/colls/list.txt?id=50068&show=ref
+for (c in 1:N)  {
+    coll<-collections[c]
+    httpO<-paste("http://paleobiodb.org/data1.2/occs/list.txt?coll_id=",coll,"&show=ref",sep="")
+    finds<-read.table(httpO, sep=',', header=T)
+    new_refs<-unique(finds$reference_no)
+    if (c==1)   {
+        references<-new_refs
+        }   else {
+        references<-c(references,new_refs)
+        }
+    }
+#ttlrefs<-max(references)
+#impact<-vector(length=ttlrefs)
+#for (t in 1:ttlrefs)    impact[references[t]]<-impact[references[t]]+1
+
+novel_refs<-sort(unique(subset(references,references<100000)))
+refs<-length(novel_refs)
+
+for (r in 1:refs)   {
+    cit<-novel_refs[r]
+    httpR<-paste("http://paleobiodb.org/data1.2/refs/single.ris?id=",cit,"&textresult",sep="")
+    article<-read.table(httpR, sep="\n", header=T)
+    ll<-dim(article)[1]
+    art<-article[3:ll,1]
+    art<-c(as.character(art),"")
+    if (r==1)   {
+        alexandria<-art
+        }   else {
+        alexandria<-c(as.character(alexandria),as.character(art))
+        }
+    }
+filename<-paste(project_name,"References.ris",sep="_")
+write.table(alexandria,filename,sep="",quote=FALSE, eol="\n",row.names=FALSE,col.names=FALSE)
+return(alexandria)
+}

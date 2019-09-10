@@ -1,15 +1,31 @@
-install.packages("paleobioDB", dependencies=TRUE)
+#install.packages("paleobioDB", dependencies=TRUE)
 library(paleobioDB)
 
-# download all occurrences entered from oldest date to youngest ate.  Returns: 1) List of species without taxonomic data; 2) list of species with taxonomic data plus latest opinion information.
-taxon<-"Trilobita"
-oldest<-"Cambrian"
-youngest<-"Ordovician"
-start_date<-"2015-01-01"
-end_date<-"2015-12-31"
+# download all occurrences entered from oldest date to youngest date.  Returns: 
+#	1) List of species without taxonomic data;
+#	2) list of species with taxonomic data plus latest opinion information.
+# requires:
+#	1) taxon (e.g., "Gastropoda")
+#	2) oldest age for records (e.g., "Paleogene")
+#	3) youngest age for records (e.g., "Neogene")
+#	4) oldest entered records into PaleoDB (e.g., "1998-01-01": nothing entered before that)
+#			the idea is that you can get records entered after your last curation
+#	5) youngest entered records into PaleoDB (e.g., "2018-01-01": nothing entered after that)
+#			if you enter a date in the future, then everything up to today should be included
+#	6) ending of file format: you can enter:
+#			".txt" for text
+#			".xls" tab-delimited that usually will be opened by Excel
+#			."tab" for tab-delimited
+taxon<-"Cypraeoidea"
+oldest<-"Cretaceous"
+youngest<-"Quaternary"
+start_date<-"1998-01-01"
+end_date<-"2016-12-31"
 file_format<-".xls"
+
 # this will return all Paleozoic gastropod entered in January-April of 2015, with separate .xls files for species with and without taxonomic data. 
 paleodb_occurrence_curation(taxon,oldest,youngest,start_date,end_date,file_format)
+
 
 # Find genera with gaps in their range ≥ specified amount (signif_gap).  Returns list giving latest occurrence on old end of range and earliest occurrence on the young end fo the range
 taxon<-"Cypraeidae"
@@ -50,9 +66,10 @@ youngest<-"Cenozoic"
 file_format<-".xls"
 get_records<-TRUE
 get_localities<-TRUE
-get_taxonomy<-TRUE
+get_abundances<-FALSE
+get_taxonomy<-FALSE
 # if "get_records," "get_localities" and "get_taxonomy" all are set to 'TRUE' then this basically gives you everything about Paleozoic gastropods. 
-paleodb_data_download(taxon,oldest,youngest,get_records,get_localities, get_taxonomy,file_format)
+paleodb_data_download(taxon,oldest,youngest,get_records,get_localities,get_abundances,get_taxonomy,file_format)
 
 # download all occurrence, collection and taxonomic data for some taxonomic group
 taxon<-"Cathaysiorthidae"
@@ -103,3 +120,14 @@ youngest<-"Norian"
 today<-"2015-08-04"
 file_format<-".xls"
 paleodb_vett_formations(taxon,oldest,youngest,today,file_format)
+
+
+http://paleobiodb.org/data1.2/occs/list.tsv?datainfo&rowcount&base_name=Cypraeoidea&interval=Cretaceous,Quaternary&occs_created_after=1998-01-01&occs_created_before=2017-01-01
+http://paleobiodb.org/data1.2/occs/list.tsv?base_name=Cypraeoidea&interval=Cretaceous,Quaternary&occs_created_after=1998-01-01&occs_created_before=2017-01-01
+http://paleobiodb.org/data1.2/occs/list.tsv?base_name=Cypraeoidea&taxon_reso=species&interval=Cretaceous,Quaternary&occs_created_after=1998-01-01&occs_created_before=2017-01-01
+http://paleobiodb.org/data1.2/occs/list.tsv?base_name=Cypraeoidea&interval=Cretaceous,Quaternary&occs_created_after=1998-01-01&occs_created_before=2017-01-01&show=ref
+https://paleobiodb.org/data1.2/occs/taxa.tsv?base_name=Cypraeoidea&interval=Cretaceous,Quaternary&occs_created_after=1998-01-01&occs_created_before=2017-01-01&show=ref
+https://paleobiodb.org/data1.2/occs/taxa.tsv?datainfo&rowcount&base_name=Cypraeoidea&interval=Cretaceous,Quaternary&occs_created_after=1998-01-01&occs_created_before=2017-01-01&show=ref
+https://paleobiodb.org/data1.2/occs/taxa.tsv?base_name=Cypraeoidea&interval=Cretaceous,Quaternary&occs_created_after=1998-01-01&occs_created_before=2017-01-01&show=ref
+https://paleobiodb.org/data1.2/occs/taxa.tsv?base_name=Cypraeoidea&interval=Cretaceous,Quaternary&occs_created_after=1998-01-01
+https://paleobiodb.org/data1.2/occs/taxa.tsv?base_name=Cypraeoidea&interval=Cretaceous,Quaternary&occs_created_after=1998-01-01
