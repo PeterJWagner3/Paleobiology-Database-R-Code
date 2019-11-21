@@ -3869,14 +3869,19 @@ return(paleodb_collections);
 reparo_unedittable_paleodb_collections <- function(paleodb_collections,paleodb_collection_edits)	{
 editted_fields <- colnames(paleodb_collection_edits);
 
-editted_colls <- match(paleodb_collections$collection_no,paleodb_collection_edits$collection_no);
-editted_colls <- editted_colls[!is.na(editted_colls)];
-colls_to_edit <- match(paleodb_collection_edits$collection_no,paleodb_collections$collection_no);
-colls_to_edit <- colls_to_edit[!is.na(colls_to_edit)];
+editted_colls <- match(paleodb_collections$collection_no,as.numeric(paleodb_collection_edits$collection_no));
+editted_colls <- unique(editted_colls[!is.na(editted_colls)]);
+colls_to_edit <- match(as.numeric(paleodb_collection_edits$collection_no),paleodb_collections$collection_no);
+colls_to_edit <- unique(colls_to_edit[!is.na(colls_to_edit)]);
+if (length(editted_colls)!=length(colls_to_edit))	{
+	paleodb_collections$collection_no[colls_to_edit] %in% as.numeric(paleodb_collection_edits$collection_no[editted_colls])
+	as.numeric(paleodb_collection_edits$collection_no[editted_colls]) %in% paleodb_collections$collection_no[colls_to_edit]
+	}
 
 for (ef in 1:length(editted_fields))	{
 	if (editted_fields[ef]!="collection_no")	{
 		field_to_edit <- match(editted_fields[ef],colnames(paleodb_collections));
+		length(paleodb_collections[colls_to_edit,field_to_edit]) <- length(paleodb_collection_edits[editted_colls,ef]);
 		paleodb_collections[colls_to_edit,field_to_edit] <- paleodb_collection_edits[editted_colls,ef];
 #		cbind(paleodb_collections[colls_to_edit,field_to_edit],paleodb_collection_edits[editted_colls,2]);
 		}
