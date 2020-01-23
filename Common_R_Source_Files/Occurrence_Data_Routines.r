@@ -103,22 +103,27 @@ return(colSums(collection_finds));
 }
 
 # count rock-units occupied by subintervals, with possible fractional counts
-tally_rock_units_occupied_by_subinterval <- function(taxon_collections,hierarchical_chronostrat,constrain=F,temporal_precision=0.1)	{
+#tally_rock_units_occupied_by_subinterval <- function(taxon_collections,hierarchical_chronostrat,constrain=F,temporal_precision=0.1)	{
+tally_rock_units_occupied_by_subinterval <- function(taxon_collections,finest_chronostrat,constrain=F,temporal_precision=0.1)	{
 # coll_no: collection number
 # early_interval: earliest possible chronostratigraphic interval for corresponding coll_no
 # late_interval: lateest possible chronostratigraphic interval for corresponding coll_no
 # hierarchical_chronostrat: table denoting which chronostratigraphic units are subunits of others
 # constrain: return only relevant time intervals; otherwise, return results for entire time scale.
-finest_chronostrat <- subset(hierarchical_chronostrat,hierarchical_chronostrat$bin_first==hierarchical_chronostrat$bin_last);
-finest_chronostrat <- finest_chronostrat[unique(match(finest_chronostrat$bin_first,finest_chronostrat$bin_first)),];
+#finest_chronostrat <- subset(hierarchical_chronostrat,hierarchical_chronostrat$bin_first==hierarchical_chronostrat$bin_last);
+#finest_chronostrat <- finest_chronostrat[unique(match(finest_chronostrat$bin_first,finest_chronostrat$bin_first)),];
 if (constrain)	{
 	early_interval <- as.character(taxon_collections$interval_lb);
 	late_interval <- as.character(taxon_collections$interval_ub);
-	fa_latest <- min(unique(hierarchical_chronostrat$bin_last[match(late_interval,hierarchical_chronostrat$interval)]));
-	la_earliest <- max(unique(hierarchical_chronostrat$bin_first[match(early_interval,hierarchical_chronostrat$interval)]));
+	fa_latest <- min(unique(finest_chronostrat$bin_last[match(late_interval,finest_chronostrat$interval)]));
+	la_earliest <- max(unique(finest_chronostrat$bin_first[match(early_interval,finest_chronostrat$interval)]));
+#	fa_latest <- min(unique(hierarchical_chronostrat$bin_last[match(late_interval,hierarchical_chronostrat$interval)]));
+#	la_earliest <- max(unique(hierarchical_chronostrat$bin_first[match(early_interval,hierarchical_chronostrat$interval)]));
 	} else	{
-	fa_latest <- min(hierarchical_chronostrat$bin_first);
-	la_earliest <- max(hierarchical_chronostrat$bin_last);
+	fa_latest <- min(finest_chronostrat$bin_first);
+	la_earliest <- max(finest_chronostrat$bin_last);
+#	fa_latest <- min(hierarchical_chronostrat$bin_first);
+#	la_earliest <- max(hierarchical_chronostrat$bin_last);
 	}
 taxon_collections <- name_unnamed_rock_units(paleodb_collections=taxon_collections,finest_chronostrat);
 unique_rocks <- sort(unique(taxon_collections$rock_no_sr[taxon_collections$rock_no_sr>0]));

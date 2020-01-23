@@ -234,7 +234,7 @@ for (ll in 1:(length(lb)-1))	{
 return(joint_ranges);
 }
 
-completely_rebin_collections_with_uniform_time_scale <- function(collections,uniform_time_scale)	{
+completely_rebin_collections_with_uniform_time_scale <- function(collections,uniform_time_scale,add_bins=F)	{
 uniform_time_scale$ma_lb <- 0.001*round(uniform_time_scale$ma_lb/0.001,0);
 uniform_time_scale$ma_ub <- 0.001*round(uniform_time_scale$ma_ub/0.001,0);
 if (!is.null(collections$ma_lb))	{
@@ -254,10 +254,17 @@ if (!is.null(collections$interval_lb))	{
 	int_ub_col <- match("late_interval",colnames(collections));
 	}
 age <- collections[,ma_lb_col];
+#for (a in 1:length(age))	{
+#	collections[a,int_lb_col] <- rebin_collection_with_time_scale(age=age[a],onset_or_end="onset",fine_time_scale=uniform_time_scale);
+#	}
 collections[,int_lb_col] <- sapply(age,rebin_collection_with_time_scale,onset_or_end="onset",fine_time_scale=uniform_time_scale);
+
 age <- collections[,ma_ub_col];
+#for (a in 1:length(age))	{
+#	collections[a,int_ub_col] <- rebin_collection_with_time_scale(age=age[a],onset_or_end="end",fine_time_scale=uniform_time_scale);
+#	}
 collections[,int_ub_col] <- sapply(age,rebin_collection_with_time_scale,onset_or_end="end",fine_time_scale=uniform_time_scale);
-if (!is.null(collections$bin_lb))	{
+if (!is.null(collections$bin_lb) || add_bins)	{
 	collections$bin_lb <- match(collections[,int_lb_col],uniform_time_scale$interval);
 	collections$bin_ub <- match(collections[,int_ub_col],uniform_time_scale$interval);
 	}
@@ -275,9 +282,9 @@ rebin_collection_with_time_scale <- function(age,onset_or_end,fine_time_scale)	{
 #	  e.g., just Cambrian, Ordovician, Silurian or Sandbian, Katian, Rhuddanian, etc.
 age <- round(abs(age),3);
 if (onset_or_end=="onset" || onset_or_end=="Onset")	{
-	return(as.character(fine_time_scale$interval[sum(age<=round(fine_time_scale$ma_lb,3))]));
+	return(as.character(fine_time_scale$interval[max(1,sum(age<=round(fine_time_scale$ma_lb,3)))]));
 	} else	{
-	return(as.character(fine_time_scale$interval[sum(age<round(fine_time_scale$ma_lb,3))]));
+	return(as.character(fine_time_scale$interval[max(1,sum(age<round(fine_time_scale$ma_lb,3)))]));
 	}
 }
 

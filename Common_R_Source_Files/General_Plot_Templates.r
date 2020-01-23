@@ -1,3 +1,5 @@
+default_minor_time_axis_size <- 4.285714285;
+
 make_font_Arial <- function()	{
 arial <- quartzFonts(arial = c("Arial","Arial-Bold","Arial-Italic","Avenir-BoldItalic"))
 }
@@ -179,7 +181,7 @@ for (i in 1:(lst-1)) {
 	}
 }
 
-Phanerozoic_Timescale_Plot_Flexible <- function(onset=-541, end=0, time_scale, plot_title="",mxy, mny, use_strat_labels=TRUE, strat_names, strat_colors, ordinate, yearbreaks,xsize=6, ysize=4.285714285, hues=TRUE, colored="base", alt_back=FALSE,strat_label_size=1)	{
+Phanerozoic_Timescale_Plot_Flexible <- function(onset=-541,end=0,time_scale_to_plot,mxy,mny,use_strat_labels=TRUE,strat_names,strat_colors,plot_title="",ordinate="",abscissa="Ma",yearbreaks,xsize=6, ysize=4.285714285,hues=TRUE,colored="base",alt_back=FALSE,strat_label_size=1)	{
 # UPDATED 2016-12-31
 #	Smaller updates 2018-08-31
 # onset: when to start x-axis (use -100 for 100 Million years ago)
@@ -199,12 +201,12 @@ Phanerozoic_Timescale_Plot_Flexible <- function(onset=-541, end=0, time_scale, p
 # colored: where the colors should be: base or background
 # alt_back: alternating white and light gray backgrouns
 # use_strat_labels added 2016/09/23
-if (time_scale[1]>0)	time_scale <-  -1*time_scale;
+if (time_scale_to_plot[1]>0)	time_scale_to_plot <-  -1*time_scale_to_plot;
 if (onset>0)			onset <- -1*onset;
 if (end>0)				end <- -1*end;
-lst <- length(time_scale)
-first_period <- sum(time_scale<=onset)
-last_period <- sum(time_scale<=end)
+lst <- length(time_scale_to_plot)
+first_period <- sum(time_scale_to_plot<=onset)
+last_period <- sum(time_scale_to_plot<=end)
 #if (is.na(match(end,time_scale)))	{
 #	last_period <- match(end,time_scale)
 #	}	else {
@@ -218,7 +220,7 @@ for (i in 1:draws)	stx[i] <- yearbreaks[i]*ceiling(onset/yearbreaks[i])
 exy <- (mxy-mny)/25;
 #print(c(xsize,ysize));
 par(pin=c(xsize,ysize));
-plot(NA,type='n',axes=FALSE,main=plot_title,xlab="Millions of Years Ago",ylab=ordinate,xlim=c(onset,end),ylim=c(mny-exy,mxy))
+plot(NA,type='n',axes=FALSE,main=plot_title,xlab=abscissa,ylab=ordinate,xlim=c(onset,end),ylim=c(mny-exy,mxy))
 #axis(1,at=seq(onset,end,by=abs(onset-end)),tcl=0.0,labels=FALSE,lwd=2)
 if (draws==2)	{
 	pts <- c(-0.15,-0.30)
@@ -241,98 +243,130 @@ for (i in 1:draws)	{
 
 if (alt_back && colored!="backdrop")
 	for (b in first_period:last_period)
-		if (gtools::even(b))	rect(max(onset,time_scale[b]),mny,min(end,time_scale[b+1]),mxy,col="gray90",border="gray90")
+		if (gtools::even(b))	rect(max(onset,time_scale_to_plot[b]),mny,min(end,time_scale_to_plot[b+1]),mxy,col="gray90",border="gray90")
 
 if (hues)	{
 	if (colored=="base")	{
 		for (b in first_period:last_period)
-			rect(max(onset,time_scale[b]),mny,min(end,time_scale[b+1]),(mny-2*exy),col=as.character(strat_colors[b]),border=as.character(strat_colors[b]))
+			rect(max(onset,time_scale_to_plot[b]),mny,min(end,time_scale_to_plot[b+1]),(mny-2*exy),col=as.character(strat_colors[b]),border=as.character(strat_colors[b]))
 		} else {
 		for (b in first_period:last_period)
-			rect(max(onset,time_scale[b]),mny,min(end,time_scale[b+1]),mxy,col=strat_colors[b],border=strat_colors[b])
+			rect(max(onset,time_scale_to_plot[b]),mny,min(end,time_scale_to_plot[b+1]),mxy,col=strat_colors[b],border=strat_colors[b])
 		rect(onset,mny+exy,end,mxy,col=makeTransparent("white",50),border=makeTransparent("white",50))
 		}
 	}
 
 # put in lines separating stages
-for (s in first_period:last_period)  segments(time_scale[s],mny,time_scale[s],mny-2*exy,lwd=0.5,col="gray25")
+for (s in first_period:last_period)  segments(time_scale_to_plot[s],mny,time_scale_to_plot[s],mny-2*exy,lwd=0.5,col="gray25")
 # put in decisive final line
-if (!is.na(match(end,time_scale)))	segments(end,mny,end,mny-2*exy);
+if (!is.na(match(end,time_scale_to_plot)))	segments(end,mny,end,mny-2*exy);
 segments(onset,mny,end,mny,lwd=2)
 segments(onset,mny-2*exy,end,mny-2*exy,lwd=2)
 
 if (use_strat_labels)	{
-	thin_bin <- min(abs(time_scale[2:length(time_scale)]-time_scale[1:(length(time_scale)-1)])/abs(onset-end));
+	thin_bin <- min(abs(time_scale_to_plot[2:length(time_scale_to_plot)]-time_scale_to_plot[1:(length(time_scale_to_plot)-1)])/abs(onset-end));
 	mid <- vector(length=(lst-1));
-	for (i in 1:(lst-1))    mid[i] <- (max(onset,time_scale[i])+min(end,time_scale[(i+1)]))/2;
+	for (i in 1:(lst-1))    mid[i] <- (max(onset,time_scale_to_plot[i])+min(end,time_scale_to_plot[(i+1)]))/2;
 	dummy <- vector(length=(lst-1));
 	for (i in 1:(lst-1))    dummy[i] <- mny-exy;
 	#add something
 	text(mid[first_period:last_period],dummy[first_period:last_period],label=strat_names[first_period:last_period],cex=min(2,thin_bin*xsize*strat_label_size));
 	}
 }
-
-Phanerozoic_Timescale_Plot_Flexible_Ordinate <- function(onset=-541, end=0, time_scale, mxn, mnn, use_strat_labels=TRUE, strat_names, strat_colors, ordinate, abscissa, yearbreaks,ysize=6, xsize=4.285714285, hues=FALSE, colored="base",stage_lab_size=1.0)	{
-# ordinate: y-axis label
-# use_strat_labels added 2016/09/23
+														
+Phanerozoic_Timescale_Plot_Flexible_Ordinate <- function(onset=-541,end=0,time_scale_to_plot,mxx,mnx,use_strat_labels=TRUE,strat_names,strat_colors,plot_title="",abscissa="",ordinate="Ma",yearbreaks,ysize=6,xsize=4.285714285,hues=TRUE,colored="base",alt_back=FALSE,strat_label_size=1,stage_box_width=0.025)	{
+# UPDATED 2016-12-31
+#	Smaller updates 2018-08-31
+#	Smaller updates 2019-09-16
+#	Smaller updates 2019-10-18
+# onset: when to start x-axis (use -100 for 100 Million years ago)
+# end: when to end x-axis 0
 # time_scale: vector giving start of each bin, with one more than bins
-if (time_scale[1]>0)	time_scale <-  -1*time_scale;
+# mxy: maximum value for y-axis
+# mny: minimum value for y-axis
+# use_strat_labels: true means that you put labels on stratigraphic unts
+# strat_names: names to use for those labels
+# strat_colors
+# ordinate: label for Y-axis
+# yearbreaks: where to put minor & major breaks; c(10,50,100) will put minor
+#	medium and major breaks at 10, 50 & 100 Ma marks
+# xsize: dimension of X-axis for plot for par(pin=c(xsize,ysize)) command
+# ysize: dimension of Y-axis for plot for par(pin=c(xsize,ysize)) command
+# hues: we want colors
+# colored: where the colors should be: base or background
+# alt_back: alternating white and light gray backgrouns
+# use_strat_labels added 2016/09/23
+if (time_scale_to_plot[1]>0)	time_scale_to_plot <-  -1*time_scale_to_plot;
 if (onset>0)			onset <- -1*onset;
 if (end>0)				end <- -1*end;
-lst <- length(time_scale);
-first_period <- sum(time_scale<=onset)
-last_period <- sum(time_scale<=end)
+lst <- length(time_scale_to_plot)
+first_period <- sum(time_scale_to_plot<=onset)
+last_period <- sum(time_scale_to_plot<=end)
 
 draws <- length(yearbreaks)
-sty <- vector(length=draws)
-for (i in 1:draws)	sty[i] <- yearbreaks[i]*ceiling(onset/yearbreaks[i])
+stx <- vector(length=draws)
+for (i in 1:draws)	stx[i] <- yearbreaks[i]*ceiling(onset/yearbreaks[i])
+
+exx <- stage_box_width*(mxx-mnx);
+#print(c(xsize,ysize));
+par(pin=c(xsize,ysize));
+#plot(NA,type='n',axes=FALSE,main=plot_title,ylab=ordinate,xlab=abscissa,ylim=c(onset,end),xlim=c(mnx-exx,mxx));
+plot(NA,type='n',axes=FALSE,main=plot_title,ylab=ordinate,xlab=abscissa,ylim=c(onset,end),xlim=c(mnx-exx,mxx),xaxs="i",yaxs="i");
+#axis(2,at=seq(onset,end,by=abs(onset-end)),tcl=0.0,labels=FALSE,lwd=2);
+# set size of ticks
 if (draws==2)	{
 	pts <- c(-0.15,-0.30)
 	}	else if (draws==3)	{
 	pts <- c(-0.1,-0.2,-0.3)
 	}
+for (i in 1:draws)	{
+	on <- yearbreaks[i]*ceiling(onset/yearbreaks[i]);
+	en <- yearbreaks[i]*floor(end/yearbreaks[i]);
+	tcs <- seq(on,en,by=yearbreaks[i]);
+	if (i < draws)	{
+		on2 <- yearbreaks[i+1]*ceiling(onset/yearbreaks[i+1]);
+		en2 <- yearbreaks[i+1]*floor(end/yearbreaks[i+1]);
+		tcs <- tcs[!tcs %in% seq(on2,en2,by=yearbreaks[i+1])]
+		axis(2,at=tcs,tcl=pts[i],labels=FALSE,lwd=0,lwd.ticks=4/3);
+		}	else	{
+		axis(2,at=tcs,tcl=pts[i],labels=abs(tcs),lwd=0.0,lwd.ticks=4/3,las=2)
+		}
+	}
 
-par(pin=c(xsize,ysize))
-plot(NA,type='n',axes=FALSE,main="",xlab=abscissa,ylab=ordinate,xlim=c(mnx,mxx),ylim=c(onset,end))
-exx <- (mxx-mnx)/25
-#segments(onset,mny+exy,onset,mny-exy)
+if (alt_back && colored!="backdrop")
+	for (b in first_period:last_period)
+		if (gtools::even(b))	rect(max(onset,time_scale_to_plot[b]),mnx,min(end,time_scale_to_plot[b+1]),mxx,col="gray90",border="gray90")
+
 if (hues)	{
-#	per_colors <- Phanerozoic_Period_Colors()
 	if (colored=="base")	{
 		for (b in first_period:last_period)
-			rect((mnx+exx),max(onset,time_scale[b]),(mnx-exx),min(end,time_scale[b+1]),col=as.character(strat_colors[b]),border=as.character(strat_colors[b]))
+			rect(0,max(onset,time_scale_to_plot[b]),(mnx-exx),min(end,time_scale_to_plot[b+1]),col=as.character(strat_colors[b]),border=as.character(strat_colors[b]));
+#			rect(mnx,max(onset,time_scale_to_plot[b]),0,min(end,time_scale_to_plot[b+1]),col=as.character(strat_colors[b]),border=as.character(strat_colors[b]));
 		} else {
 		for (b in first_period:last_period)
-			rect(mnx+exx,max(onset,time_scale[b]),mxx,min(end,time_scale[b+1]),col=strat_colors[b],border=strat_colors[b])
+			rect(mnx,max(onset,time_scale_to_plot[b]),mxx,min(end,time_scale_to_plot[b+1]),col=strat_colors[b],border=strat_colors[b])
 		rect(mnx+exx,onset,mxx,end,col=makeTransparent("white",50),border=makeTransparent("white",50))
 		}
 	}
-for (s in first_period:last_period)  segments(mnx+exx,time_scale[s],mnx-exx,time_scale[s],lwd=0.5,col="gray25")
-if (is.na(match(end,time_scale))==FALSE)	{
-	segments(mnx+exx,onset,mnx+exx,end)
-	}	else	{
-	segments(mnx+exx,onset,mnx+exx,end,lwd=1)	
-	}
+
+# put in lines separating stages
+for (s in first_period:last_period)  segments(0,time_scale_to_plot[s],mnx-exx,time_scale_to_plot[s],lwd=0.5,col="gray25");
+# put in decisive final line
+if (!is.na(match(end,time_scale_to_plot)))	segments(0,end,mnx-exx,end);
+segments(0,onset,0,end,lwd=2);
+axis(2,at=seq(onset,end,by=abs(onset-end)),tcl=0.0,labels=FALSE,lwd=2);
+#points(0,-450)
+#points(mnx,-450)
+#points(mnx-exx,-450)
 if (use_strat_labels)	{
-	mid <- vector(length=(lst-1))
-	for (i in 1:(lst-1))    mid[i] <- (max(onset,time_scale[i])+min(end,time_scale[(i+1)]))/2
-	dummy <- vector(length=(lst-1))
-	for (i in 1:(lst-1))    dummy[i] <- mnx
+	thin_bin <- min(abs(time_scale_to_plot[2:length(time_scale_to_plot)]-time_scale_to_plot[1:(length(time_scale_to_plot)-1)])/abs(onset-end));
+	mid <- vector(length=(lst-1));
+	for (i in 1:(lst-1))    mid[i] <- (max(onset,time_scale_to_plot[i])+min(end,time_scale_to_plot[(i+1)]))/2;
+	dummy <- vector(length=(lst-1));
+	for (i in 1:(lst-1))    dummy[i] <- (mnx-exx)/2;
 	#add something
-	text(dummy[first_period:last_period],mid[first_period:last_period],label=strat_names[first_period:last_period],cex=stage_lab_size)
+	text(dummy[first_period:last_period],mid[first_period:last_period],label=strat_names[first_period:last_period],cex=min(2,thin_bin*xsize*strat_label_size));
 	}
-for (i in 1:(draws-1))	{
-	axis(2,at=seq(sty[i],end,by=yearbreaks[i]),tcl=pts[i],labels=FALSE,lwd=0,lwd.ticks=4/3)
-	}
-axis(2,at=seq(onset,end,by=0.1),tcl=0.0,labels=FALSE,lwd=4/3)
-yearsago <- vector(length=1)
-a <- 1
-yearsago[a] <- abs(sty[draws])
-while (yearsago[a]>(abs(end)+yearbreaks[draws]))	{
-	yearsago <- c(yearsago,yearsago[a]-yearbreaks[draws])
-	a <- a+1
-	}
-axis(2,at=seq(sty[draws],end,by=yearbreaks[draws]),tcl=pts[draws],labels=yearsago,lwd=0,lwd.ticks=4/3,las=2)
 }
 
 #### routines to get IGS colors for geological ages
@@ -876,7 +910,7 @@ for (i in 1:ticks)	{
 	}
 }
 
-spindle_diagram <- function(bin_onsets,spindled_midpts,spindled_counts,bin_colors,plot_on_y=TRUE,bar_legend=TRUE,legend_width=1,legend_case="Unit")	{
+spindle_diagram <- function(bin_onsets,spindled_midpts,spindled_counts,bin_colors,plot_on_y=T,bar_legend=T,legend_width=1,legend_case="Unit")	{
 # bin_onsets: vector giving where (on X or Y axis)
 # spindled_midpts: the position where the middle of each spindle segment is plotted
 # spindled_counts: matrix giving the number of times an observation is made
@@ -887,20 +921,21 @@ spindle_diagram <- function(bin_onsets,spindled_midpts,spindled_counts,bin_color
 # bar_legend: if TRUE,then print a legend for width
 # legend_width: the width being plotted
 # legend_case: Unit name (e.g., "case" or "clade") that one example represents
-bins <- dim(spindled_counts)[1]
-bin_mids <- (bin_onsets[1:bins]+bin_onsets[2:(bins+1)])/2
-bin_widths <- abs(bin_onsets[1:bins]-bin_onsets[2:(bins+1)])
+bins <- dim(spindled_counts)[1];
+bin_mids <- (bin_onsets[1:bins]+bin_onsets[2:(bins+1)])/2;
+bin_widths <- abs(bin_onsets[1:bins]-bin_onsets[2:(bins+1)]);
 bin_maxs <- vector(length=bins)
-for (i in 1:bins)	bin_maxs[i] <- max(spindled_counts[i,])
-width_of_one <- min(bin_widths/bin_maxs)
+for (i in 1:bins)	bin_maxs[i] <- max(spindled_counts[i,]);
+width_of_one <- min(bin_widths/bin_maxs);
 y_hts <- abs(spindled_midpts[1]-spindled_midpts[2])/2
 #cbind(bin_maxs,bin_widths,bin_widths/bin_maxs)
 #which(spindled_counts==mxwd,arr.ind=TRUE)
+print(c(width_of_one,legend_width));
 for (s in 1:bins)	{
 	toplot <- spindled_midpts[spindled_counts[s,]>0]
 	tocount <- spindled_counts[s,spindled_counts[s,]>0]
 	for (i in 1:length(toplot))	{
-		if (plot_on_y==TRUE)	{
+		if (plot_on_y)	{
 			x1 <- as.numeric(bin_mids[s]-(width_of_one/2)*tocount[i])
 			x2 <- as.numeric(bin_mids[s]+(width_of_one/2)*tocount[i])
 			y1 <- as.numeric(toplot[i])-y_hts
@@ -916,14 +951,14 @@ for (s in 1:bins)	{
 	}
 # do legend if requested
 if (bar_legend)	{
-	xleg <- max(bin_onsets)-(0.2*(max(bin_onsets)-min(bin_onsets)))
-	if (plot_on_y==TRUE)	{
-		x1 <- xleg-((width_of_one/2)*legend_width)
-		x2 <- xleg+((width_of_one/2)*legend_width)
-		x3 <- xleg+((width_of_one/2)*legend_width)
-		y1 <- max(spindled_midpts)+y_hts
-		y2 <- max(spindled_midpts)-y_hts
-		y3 <- (y1+y2)/2
+	xleg <- max(bin_onsets)-(0.2*(max(bin_onsets)-min(bin_onsets)));
+	if (plot_on_y)	{
+		x1 <- xleg-((width_of_one/2)*legend_width);
+		x2 <- xleg+((width_of_one/2)*legend_width);
+		x3 <- xleg+((width_of_one/2)*legend_width);
+		y1 <- max(spindled_midpts)+y_hts;
+		y2 <- max(spindled_midpts)-y_hts;
+		y3 <- (y1+y2)/2;
 		}	else	{
 		y1 <- xleg-((width_of_one/2)*legend_width)
 		y2 <- xleg+((width_of_one/2)*legend_width)

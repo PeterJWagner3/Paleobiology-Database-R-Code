@@ -39,7 +39,7 @@ fetched <- gsub("\"","",simplify2array(strsplit(fetch,"\r\n"))[,1]);
 if (!is.na(match("THIS REQUEST RETURNED NO RECORDS",fetched)))	{
 	desired_finds <- c();
 	} else	{
-	all_finds <- utils::read.csv(text = fetch, header = FALSE, stringsAsFactors=FALSE);
+	all_finds <- utils::read.csv(text = fetch, header = FALSE, stringsAsFactors=FALSE,encoding="UTF-8");
 	if (all_finds[1,1]=="Warning:")	{
 		# this will happen only if something goes badly wrong.
 		cc <- match("occurrence_no",all_finds[,1])
@@ -49,7 +49,7 @@ if (!is.na(match("THIS REQUEST RETURNED NO RECORDS",fetched)))	{
 		colnames(all_finds) <- kluge_mc_kluge_face;
 		all_finds <- all_finds[(cc+1):nrow(all_finds),];
 		} else	{
-		all_finds <- utils::read.csv(text = fetch, header = TRUE, stringsAsFactors=FALSE);
+		all_finds <- utils::read.csv(text = fetch, header = TRUE, stringsAsFactors=FALSE,encoding = "UTF-8");
 		}
 	all_finds <- evanesco_na_from_matrix(data=all_finds,replacement = "");
 	if (species_only)	{
@@ -214,7 +214,7 @@ if (!is.na(match("THIS REQUEST RETURNED NO RECORDS",fetched)))	{
 				output <- paste(directory,output,sep="");
 			if (output_type==".csv")	{
 				output <- gsub("TRUE","",output);
-				write.csv(desired_finds,file=output,row.names = FALSE);
+				write.csv(desired_finds,file=output,row.names = FALSE,fileEncoding="UTF-8");
 				}	else	{
 				output <- gsub("TRUE","",output);
 				write.table(desired_finds,file=output,sep = "\t",row.names = FALSE,col.names = TRUE);
@@ -231,7 +231,7 @@ accio_occurrences_from_one_paleodb_collection <- function(coll_id)	{
 # coll_id <- 12408;
 http <- paste("https://paleobiodb.org/data1.2/occs/list.csv?coll_id=",coll_id,"&show=refattr,classext,rem,entname,abund&limit=all",sep = "");
 fetch <- RCurl::getURL(http);
-coll_finds <- utils::read.csv(text = fetch, header = TRUE, stringsAsFactors=FALSE);
+coll_finds <- utils::read.csv(text = fetch, header = TRUE, stringsAsFactors=FALSE,encoding = "UTF-8");
 return(coll_finds);
 }
 
@@ -334,7 +334,7 @@ while (tx <= ntaxa)	{
 	print(paste(taxon_list[tx],", ",tx," of ",ntaxa,sep=""))
 	http1 <- paste("http://paleobiodb.org/data1.2/taxa/list.csv?base_name=",taxon_list[tx],"&rank=genus,subgenus&private&show=attr,app",sep="")
 	accio <- RCurl::getURL(http1)
-	taxon_info <- data.frame(utils::read.csv(text = accio, header = TRUE, stringsAsFactors=FALSE))
+	taxon_info <- data.frame(utils::read.csv(text = accio, header = TRUE, stringsAsFactors=FALSE,encoding="UTF-8"))
 
 	## If the taxon is absent, then something weird will happen: kill it with fire.
 	if (ncol(taxon_info)<=2 || (taxon_info[1,1]=="THIS REQUEST RETURNED NO RECORDS" || taxon_info=="THIS.REQUEST.RETURNED.NO.RECORDS"))	{
@@ -368,7 +368,7 @@ while (tx <= ntaxa)	{
 	if (max(taxon_info$n_occs)>0)	{
 		http2 <- paste("http://paleobiodb.org/data1.2/occs/list.csv?base_name=",taxon_list[tx],"&show=coll,strat,refattr&limit=all",sep = "")
 		accio <- RCurl::getURL(http2)
-		all_finds <- utils::read.csv(text = accio, header = TRUE, stringsAsFactors=FALSE)
+		all_finds <- utils::read.csv(text = accio, header = TRUE, stringsAsFactors=FALSE,encoding="UTF-8");
 		all_finds <- subset(all_finds,all_finds$identified_rank=="species")
 		ttl_finds <- nrow(all_finds)
 		if (ttl_finds>0)	{
@@ -450,7 +450,7 @@ taxa <- paste(taxon, collapse = ",");
 taxa <- gsub(" ","%20",taxa);
 http <- paste("http://paleobiodb.org/data1.2/occs/list.csv?base_name=",taxa,"&show=refattr,classext,rem,entname&limit=all",sep = "");
 fetch <- RCurl::getURL(http);
-all_finds <- utils::read.csv(text = fetch, header = TRUE, stringsAsFactors=FALSE);
+all_finds <- utils::read.csv(text = fetch, header = TRUE, stringsAsFactors=FALSE,encoding="UTF-8");
 if (species_only)	{
 	desired_finds <- rbind(subset(all_finds,all_finds$identified_rank=="species"),subset(all_finds,all_finds$identified_rank=="subspecies"));
 	}	else	{
@@ -471,7 +471,7 @@ if (save_files)	{
 	if (directory!="")
 		output <- paste(directory,output,sep="");
 	if (output_type==".csv")	{
-		write.csv(desired_finds,file=output,row.names = FALSE);
+		write.csv(desired_finds,file=output,row.names = FALSE,fileEncoding = "UTF-8");
 		}	else	{
 		write.table(desired_finds,file=output,sep = "\t",row.names = FALSE,col.names = TRUE);
 		}
@@ -488,7 +488,7 @@ if (save_collections)	{
 	http <- paste("http://paleobiodb.org/data1.2/occs/list.csv?base_name=",taxa,"&envtype=",realm,"&interval=",onset,",",end,"&show=abund,coll&limit=all",sep = "")
 	}
 fetch <- RCurl::getURL(http)
-all_finds <- utils::read.csv(text = fetch, header = TRUE, stringsAsFactors=FALSE)
+all_finds <- utils::read.csv(text = fetch, header = TRUE, stringsAsFactors=FALSE,encoding="UTF-8")
 abundance_finds <- subset(all_finds,all_finds$abund_value!="")
 abundance_finds <- subset(abundance_finds,abundance_finds$abund_unit!="category")
 abundance_finds <- subset(abundance_finds,abundance_finds$abund_unit!="rank")
@@ -535,7 +535,7 @@ if (save_files)	{
 	if (directory!="")
 		output <- paste(directory,output,sep="");
 	if (output_type==".csv")	{
-		write.csv(abundance_finds,file=output,row.names = FALSE);
+		write.csv(abundance_finds,file=output,row.names = FALSE,fileEncoding = "UTF-8");
 		}	else	{
 		write.table(abundance_finds,file=output,sep = "\t",row.names = FALSE,col.names = TRUE);
 		}
@@ -559,12 +559,13 @@ basic_environments <- paste(basic_environments,collapse=",");
 http <- paste("http://paleobiodb.org/data1.2/colls/list.csv?base_name=",taxa,"&interval=",onset,",",end,"&envtype=",basic_environments,"&show=loc,paleoloc,strat,stratext,timebins,timecompare,lith,lithext,env,geo,methods,resgroup,ref,refattr,ent,entname,crmod",sep="");
 #http <- paste("http://paleobiodb.org/data1.2/colls/list.csv?base_name=",taxa,"&interval=",onset,",",end,"&show=loc,paleoloc,strat,stratext,refattr,entname,lith,env,crmod",sep="");
 fetch <- RCurl::getURL(http);
-collections <- utils::read.csv(text = fetch, header = TRUE, stringsAsFactors=FALSE);
+collections <- utils::read.csv(text = fetch, header = TRUE,stringsAsFactors=FALSE,encoding = "UTF-8");
+collections <- evanesco_na_from_matrix(collections);
 #	http <- paste("http://www.paleobiodb.org/data1.2/occs/list.csv?base_name=",taxa,"&interval=",onset,",",end,",&show=full,etbasis,strat,lith,env,timebins,timecompare,ref,ent,entname,crmod",sep="")
 if (species_only)	{
 	http <- paste("http://www.paleobiodb.org/data1.2/occs/list.csv?base_name=",taxa,"&interval=",onset,",",end,"&envtype=",basic_environments,"&show=full",sep="");
 	fetch <- RCurl::getURL(http);
-	species_finds <- utils::read.csv(text = fetch, header = TRUE, stringsAsFactors=FALSE);
+	species_finds <- utils::read.csv(text = fetch, header = TRUE, stringsAsFactors=FALSE,encoding = "UTF-8");
 	species_finds <- subset(species_finds,species_finds$identified_rank=="species");
 	unique_collections <- unique(species_finds$collection_no);
 	save_colls <- match(unique_collections,collections$collection_no);
@@ -574,8 +575,9 @@ if (species_only)	{
 ttl_coll <- nrow(collections);
 # clean up rock unit names
 #clean_groups <- scourgify_rock_unit_names(named_rock_unit=collections$stratgroup,delete_rock_type=TRUE)
-named_rock_unit <- collections$stratgroup
-clean_groups <- sapply(as.character(named_rock_unit),scourgify_rock_unit_names,dehyphenate=FALSE,delete_rock_type=FALSE,delete_informal=FALSE)
+named_rock_unit <- collections$stratgroup[collections$stratgroup!=""];
+clean_groups <- collections$stratgroup;
+clean_groups[collections$stratgroup!=""] <- sapply(as.character(named_rock_unit),scourgify_rock_unit_names,dehyphenate=FALSE,delete_rock_type=FALSE,delete_informal=FALSE);
 collections$stratgroup <- clean_groups
 named_rock_unit <- collections$formation;
 clean_formations <- sapply(as.character(named_rock_unit),scourgify_rock_unit_names,dehyphenate=FALSE,delete_rock_type=FALSE,delete_informal=FALSE)
@@ -643,7 +645,7 @@ if (save_files)	{
 	if (directory!="")
 		output <- paste(directory,output,sep="");
 	if (output_type==".csv")	{
-		write.csv(collections,file=output,row.names = FALSE);
+		write.csv(collections,file=output,row.names = FALSE,fileEncoding = "UTF-8");
 		}	else	{
 		write.table(collections,file=output,sep = "\t",row.names = FALSE,col.names = TRUE);
 		}
@@ -655,7 +657,7 @@ return(collections)
 accio_data_for_one_collection <- function(coll_id) { 
 http <- paste("https://paleobiodb.org/data1.2/colls/list.csv?coll_id=",coll_id,"&show=loc,paleoloc,strat,stratext,timebins,timecompare,lith,lithext,env,geo,methods,resgroup,ref,refattr,ent,entname,crmod&limit=all",sep = "");
 fetch <- RCurl::getURL(http);
-collection <- utils::read.csv(text = fetch, header = TRUE, stringsAsFactors=FALSE);
+collection <- utils::read.csv(text = fetch, header = TRUE, stringsAsFactors=FALSE,encoding="UTF-8");
 
 # clean up rock unit names
 #clean_groups <- scourgify_rock_unit_names(named_rock_unit=collections$stratgroup,delete_rock_type=TRUE)
@@ -680,7 +682,7 @@ accio_rock_unit_data <- function(taxa,onset="Cambrian",end="Holocene",standardiz
 taxa <- paste(taxa, collapse = ",");
 http <- paste("http://paleobiodb.org/data1.2/colls/list.csv?base_name=",taxa,"&interval=",onset,",",end,"&show=loc,paleoloc,strat,stratext,refattr",sep="")
 fetch <- RCurl::getURL(http);
-collections <- utils::read.csv(text = fetch, header = TRUE, stringsAsFactors=FALSE);
+collections <- utils::read.csv(text = fetch, header = TRUE, stringsAsFactors=FALSE,encoding="UTF-8");
 ttl_coll <- nrow(collections);
 
 # clean up rock unit names
@@ -750,7 +752,7 @@ if (save_files)	{
 	if (directory!="")
 		output <- paste(directory,output,sep="");
 	if (output_type==".csv")	{
-		write.csv(rock_info,file=output,row.names = FALSE);
+		write.csv(rock_info,file=output,row.names = FALSE,fileEncoding = "UTF-8");
 		}	else	{
 		write.table(rock_info,file=output,sep = "\t",row.names = FALSE,col.names = TRUE);
 		}
@@ -841,7 +843,7 @@ accio_rock_units_by_time_and_general_environment <- function(first_interval,last
 httpR <- paste("http://www.paleobiodb.org/data1.2/occs/strata.csv?base_name=Metazoa&interval=",first_interval,",",last_interval,"&envtype=",tolower(environment),"&show=coords,gplates,splates",sep="")
 #httpR <- paste("http://www.paleobiodb.org/data1.2/occs/strata.csv?base_name=Metazoa&interval="Ordovician",Llandovery&envtype=marine&show=coords,gplates,splates"
 accio <- RCurl::getURL(httpR)
-rock_info <- data.frame(utils::read.csv(text = accio, header = TRUE, stringsAsFactors=FALSE))
+rock_info <- data.frame(utils::read.csv(text = accio, header = TRUE, stringsAsFactors=FALSE,encoding="UTF-8"))
 print("data downloaded")
 
 formation_identified <- rock_info$formation <- as.character(rock_info$formation)
@@ -938,11 +940,11 @@ for (tx in 1:ntaxa)	{
 	httpT <- paste("http://paleobiodb.org/data1.2/taxa/list.csv?base_name=",taxon,"&show=attr,app",sep="")
 	## If the taxon is absent, then something weird will happen: kill it with fire.
 	accio <- RCurl::getURL(httpT)
-	taxon_info <- data.frame(utils::read.csv(text = accio, header = TRUE, stringsAsFactors=FALSE))
+	taxon_info <- data.frame(utils::read.csv(text = accio, header = TRUE, stringsAsFactors=FALSE,encoding="UTF-8"))
 	if (!(ncol(taxon_info)<=2 || (taxon_info[1,1]=="THIS REQUEST RETURNED NO RECORDS" || taxon_info=="THIS.REQUEST.RETURNED.NO.RECORDS")))	{
 		http <- paste("http://paleobiodb.org/data1.2/colls/list.csv?base_name=",taxon,"&show=full",sep="")
 		accio <- RCurl::getURL(http)
-		taxon_finds <- data.frame(utils::read.csv(text = accio, header = TRUE, stringsAsFactors=FALSE))
+		taxon_finds <- data.frame(utils::read.csv(text = accio, header = TRUE, stringsAsFactors=FALSE,encoding="UTF-8"))
 		if (nrow(taxon_finds)==1 && taxon_finds$collection_no=="THIS REQUEST RETURNED NO RECORDS")	{
 			n_occs <- 0
 			} else	{
@@ -1104,12 +1106,12 @@ accio_unique_rock_units_for_higher_taxon <- function(higher_taxon,onset="Cambria
 #ntaxa <- length(taxon_name)
 http <- paste("http://paleobiodb.org/data1.2/colls/list.csv?base_name=",higher_taxon,"&interval=",onset,",",end,"&show=loc,paleoloc,strat,stratext,refattr",sep="")
 fetch <- RCurl::getURL(http)
-collections <- utils::read.csv(text = fetch, header = TRUE, stringsAsFactors=FALSE)
+collections <- utils::read.csv(text = fetch, header = TRUE, stringsAsFactors=FALSE,encoding="UTF-8")
 #	http <- paste("http://www.paleobiodb.org/data1.2/occs/list.csv?base_name=",taxa,"&interval=",onset,",",end,",&show=full,etbasis,strat,lith,env,timebins,timecompare,ref,ent,entname,crmod",sep="")
 if (species_only)	{
 	http <- paste("http://www.paleobiodb.org/data1.2/occs/list.csv?base_name=",higher_taxon,"&interval=",onset,",",end,",&show=full",sep="")
 	fetch <- RCurl::getURL(http)
-	species_finds <- utils::read.csv(text = fetch, header = TRUE, stringsAsFactors=FALSE)
+	species_finds <- utils::read.csv(text = fetch, header = TRUE, stringsAsFactors=FALSE,encoding="UTF-8")
 	species_finds <- subset(species_finds,species_finds$identified_rank=="species")
 	unique_collections <- unique(species_finds$collection_no)
 	save_colls <- match(unique_collections,collections$collection_no)
@@ -1603,8 +1605,8 @@ if (save_files==TRUE)	{
 		file2 <- paste(directory,end,"_",taxa,"_Rocks_to_Zones_Database",output_type,sep="");
 		}
 	if (output_type==".csv" || output_type=="csv")	{
-		write.csv(rock_database,file=file1,row.names=F);
-		write.csv(rocks_to_time_scale,file=file2,row.names=F);
+		write.csv(rock_database,file=file1,row.names=F,fileEncoding = "UTF-8");
+		write.csv(rocks_to_time_scale,file=file2,row.names=F,fileEncoding = "UTF-8");
 		} else	{
 		write.table(rock_database,file=file1,sep="\t",row.names=F,col.name=T);
 		write.table(rocks_to_time_scale,file=file2,sep="\t",row.names=F,col.name=T);
@@ -1826,7 +1828,7 @@ return(collections_info)
 accio_single_locality_info <- function(collection_no)	{
 httpC <- paste("http://paleobiodb.org/data1.2/colls/list.csv?id=",collection_no,"&show=loc,paleoloc,strat,stratext,timebins,timecompare,lith,lithext,env,geo,methods,resgroup,ref,refattr,ent,entname,crmod",sep="");
 accio <- RCurl::getURL(httpC)
-coll_info <- data.frame(utils::read.csv(text = accio, header = TRUE, stringsAsFactors=FALSE))
+coll_info <- data.frame(utils::read.csv(text = accio, header = TRUE, stringsAsFactors=FALSE,encoding="UTF-8"))
 coll_info <- evanesco_na_from_vector(coll_info,"")
 return(coll_info)
 }
@@ -1854,7 +1856,7 @@ httpO <- paste("http://paleobiodb.org/data1.2/occs/list.csv?occ_id=",find_no,"&s
 accio <- RCurl::getURL(httpO);
 j <- strsplit(accio,split="",fixed=TRUE)[[1]];
 if ((j[2]=="o" && j[3]=="c") && (j[443]!="N" && j[444]!="O")) 	{
-	coll_finds <- data.frame(utils::read.csv(text = accio, header = TRUE, stringsAsFactors=FALSE))
+	coll_finds <- data.frame(utils::read.csv(text = accio, header = TRUE, stringsAsFactors=FALSE,encoding="UTF-8"))
 	coll_finds <- evanesco_na_from_vector(coll_finds,"")
 	} else {
 	coll_finds <- array("No Record",dim=c(1))
@@ -1870,7 +1872,7 @@ taxon_level <- paste(taxon_level,collapse=",");
 #http <- paste("http://paleobiodb.org/data1.2/occs/list.csv?base_name=",taxa,"&interval=",onset,",",end,"&envtype=",basic_environments,"&show=refattr,classext,rem,entname&limit=all",sep = "");
 http <- paste("http://www.paleobiodb.org/data1.2/taxa/list.csv?base_name=",taxon,"&rank=",taxon_level,"&interval=",onset,",",end,"&show=attr,app,ecospace,etbasis",sep="");
 fetch <- RCurl::getURL(http);
-taxon_guilds <- utils::read.csv(text = fetch, header = TRUE, stringsAsFactors=FALSE);
+taxon_guilds <- utils::read.csv(text = fetch, header = TRUE, stringsAsFactors=FALSE,encoding="UTF-8");
 taxon_guilds <- evanesco_na_from_matrix(taxon_guilds,"");
 
 taxon_level <- strsplit(taxon_level,split=",")[[1]];
@@ -1886,7 +1888,7 @@ if (save_files)	{
 		output <- paste(directory,end,"_",taxon,"_Basic_Ecological_Data",output_type,sep="");
 		}
 	if (output_type==".csv")	{
-		write.csv(taxon_guilds,output,row.names = F);
+		write.csv(taxon_guilds,output,row.names = F,fileEncoding = "UTF-8");
 		} else	{
 		write.table(taxon_guilds,output,row.names = F,sep="\t");
 		}
@@ -1899,7 +1901,7 @@ return(taxon_guilds);
 accio_taphonomic_data <- function(taxon,onset="Cambrian",end="Holocene",taxon_level="genus,subgenus",directory="",save_files=TRUE,output_type=".csv")	{
 http <- paste("http://www.paleobiodb.org/data1.2/taxa/list.csv?base_name=",taxon,"&rank=",taxon_level,"&show=attr,app,ttaph,etbasis",sep="")
 fetch <- RCurl::getURL(http);
-taphonomic_grades <- utils::read.csv(text = fetch, header = TRUE, stringsAsFactors=FALSE);
+taphonomic_grades <- utils::read.csv(text = fetch, header = TRUE, stringsAsFactors=FALSE,encoding="UTF-8");
 taphonomic_grades <- evanesco_na_from_matrix(taphonomic_grades,"");
 if (save_files)	{
 	if (onset!=end)	{
@@ -1908,7 +1910,7 @@ if (save_files)	{
 		output <- paste(directory,end,"_",taxon,"_Basic_Taphonomic_Data",output_type,sep="");
 		}
 	if (output_type==".csv")	{
-		write.csv(taphonomic_grades,output,row.names = F);
+		write.csv(taphonomic_grades,output,row.names = F,fileEncoding = "UTF-8");
 		} else	{
 		write.table(taphonomic_grades,output,row.names = F,sep="\t");
 		}
@@ -1920,7 +1922,7 @@ return(taphonomic_grades);
 accio_measurements <- function(taxon,onset="Cambrian",end="Holocene",directory="",save_files=TRUE,output_type=".csv")	{
 http <- paste("http://www.paleobiodb.org/data1.2/specs/measurements.csv?base_name=",taxon,"&interval=",onset,",",end,"&show=full",sep="");
 fetch <- RCurl::getURL(http);
-measurements <- utils::read.csv(text = fetch, header = TRUE, stringsAsFactors=FALSE);
+measurements <- utils::read.csv(text = fetch, header = TRUE, stringsAsFactors=FALSE,encoding="UTF-8");
 measurements <- evanesco_na_from_matrix(measurements,"");
 if (save_files)	{
 	if (onset!=end)	{
@@ -1929,7 +1931,7 @@ if (save_files)	{
 		output <- paste(directory,end,"_",taxon,"_Measurements",output_type,sep="");
 		}
 	if (output_type==".csv")	{
-		write.csv(measurements,output,row.names = F);
+		write.csv(measurements,output,row.names = F,fileEncoding = "UTF-8");
 		} else	{
 		write.table(measurements,output,row.names = F,sep="\t");
 		}
@@ -1960,7 +1962,7 @@ taxon <- gsub(" ","%20",taxon);
 httpT <- paste("http://paleobiodb.org/data1.2/taxa/list.txt?match_name=",taxon,"&show=attr,parent,class,refattr,crmod",sep="");
 #             http://paleobiodb.org/data1.2/taxa/opinions.txt?base_name=Cypraeidae&rank=species,subspecies&op_type=all
 fetch <- RCurl::getURL(httpT);
-taxon_information <- utils::read.csv(text = fetch, header = TRUE, stringsAsFactors=FALSE);
+taxon_information <- utils::read.csv(text = fetch, header = TRUE, stringsAsFactors=FALSE,encoding="UTF-8");
 if (!is.na(match(orig_taxon,taxon_information$taxon_name)))	{
 	taxon_information <- subset(taxon_information,taxon_information$taxon_name==orig_taxon);
 	} else if (!is.na(match(orig_taxon,taxon_information)))
@@ -1990,7 +1992,7 @@ for (g in 1:length(species_list))	{
 		httpT <- paste("http://paleobiodb.org/data1.2/taxa/list.txt?base_name=",taxon,"&rank=species,subspecies&variant=all&rel=all_children&show=ref,refattr",sep="")
 #             http://paleobiodb.org/data1.2/taxa/opinions.txt?base_name=Cypraeidae&rank=species,subspecies&op_type=all
 		fetch <- RCurl::getURL(httpT);
-		taxon_information <- utils::read.csv(text = fetch, header = TRUE, stringsAsFactors=FALSE);
+		taxon_information <- utils::read.csv(text = fetch, header = TRUE, stringsAsFactors=FALSE,encoding="UTF-8");
 		if (ncol(taxon_information)>2)	{
 			if (is.null(entered_species))	{
 				entered_species <- taxon_information;
@@ -2018,7 +2020,7 @@ for (g in 1:length(taxon_list))	{
 	httpT <- paste("http://paleobiodb.org/data1.2/taxa/list.txt?base_name=",taxon,"&variant=all&rel=all_children&show=attr,common,app,parent,immparent,size,class,classext,subcounts,ecospace,taphonomy,etbasis,pres,img,ref,refattr,crmod",sep="");
 #             http://paleobiodb.org/data1.2/taxa/opinions.txt?base_name=Cypraeidae&rank=species,subspecies&op_type=all
 	fetch <- RCurl::getURL(httpT);
-	taxon_information <- utils::read.csv(text = fetch, header = TRUE, stringsAsFactors=FALSE);
+	taxon_information <- utils::read.csv(text = fetch, header = TRUE, stringsAsFactors=FALSE,encoding="UTF-8");
 	relv_info <- match(taxon_list[g],taxon_information$taxon_name);
 	if (ncol(taxon_information)>2)	{
 		if (is.null(entered_taxon))	{
@@ -2033,7 +2035,7 @@ for (g in 1:length(taxon_list))	{
 #			httpT <- paste("http://paleobiodb.org/data1.2/taxa/list.txt?base_name=",taxon,"&variant=all&rel=all_children&show=ref,refattr",sep="");
 #             http://paleobiodb.org/data1.2/taxa/opinions.txt?base_name=Cypraeidae&rank=species,subspecies&op_type=all
 #			fetch <- RCurl::getURL(httpT);
-#			taxon_information <- utils::read.csv(text = fetch, header = TRUE, stringsAsFactors=FALSE);
+#			taxon_information <- utils::read.csv(text = fetch, header = TRUE, stringsAsFactors=FALSE,encoding="UTF-8");
 #			relv_info <- match(taxon,taxon_information$taxon_name);
 #			if (is.null(entered_taxon))	{
 #				entered_taxon <- taxon_information[relv_info,];
@@ -2060,7 +2062,7 @@ if (exact_match)	{
 	httpTO <- paste("http://www.paleobiodb.org/data1.2/taxa/opinions.csv?base_name=",taxon,"&op_type=all&private&show=basis,ref,refattr,ent,entname,crmod",sep="");
 	}
 accio <- RCurl::getURL(httpTO);
-taxon_opinions <- data.frame(utils::read.csv(text = accio, header = TRUE, stringsAsFactors=FALSE));
+taxon_opinions <- data.frame(utils::read.csv(text = accio, header = TRUE, stringsAsFactors=FALSE,encoding="UTF-8"));
 return(taxon_opinions);
 }
 
@@ -2075,7 +2077,7 @@ if (exact_match)	{
 	httpTO <- paste("http://www.paleobiodb.org/data1.2/taxa/opinions.csv?base_id=",taxon_no,"&op_type=all&private&show=basis,ref,refattr,ent,entname,crmod",sep="");
 	}
 accio <- RCurl::getURL(httpTO);
-taxon_opinions <- data.frame(utils::read.csv(text = accio, header = TRUE, stringsAsFactors=FALSE));
+taxon_opinions <- data.frame(utils::read.csv(text = accio, header = TRUE, stringsAsFactors=FALSE,encoding="UTF-8"));
 return(taxon_opinions);
 }
 
@@ -2213,7 +2215,7 @@ if (taxon_rank=="" || taxon_rank=="all"|| taxon_rank=="All")	{
 find_taxa <- paste(taxa, collapse = ",");
 http <- paste("http://www.paleobiodb.org/data1.2/taxa/opinions.csv?base_name=",find_taxa,accioranks,"&op_type=class&private",sep="");
 fetch <- RCurl::getURL(http);
-opinions <- utils::read.csv(text = fetch, header = TRUE, stringsAsFactors=FALSE);
+opinions <- utils::read.csv(text = fetch, header = TRUE, stringsAsFactors=FALSE,encoding="UTF-8");
 
 parents <- as.character(opinions$parent_name[match(taxa,opinions$taxon_name)]);
 unique_parents <- sort(unique(parents));
@@ -2230,7 +2232,7 @@ if (taxon_rank=="" || taxon_rank=="all" || taxon_rank=="All")	{
 find_taxa2 <- paste(unique_parents, collapse = ",");
 http2 <- paste("http://www.paleobiodb.org/data1.2/taxa/opinions.csv?base_name=",find_taxa2,accioranks2,"&op_type=class&private",sep="");
 fetch2 <- RCurl::getURL(http2);
-opinions2 <- utils::read.csv(text = fetch2, header = TRUE, stringsAsFactors=FALSE);
+opinions2 <- utils::read.csv(text = fetch2, header = TRUE, stringsAsFactors=FALSE,encoding="UTF-8");
 used_opinions2 <- opinions2[match(unique_parents,opinions2$taxon_name),];
 parent_ranks <- as.character(used_opinions2$taxon_rank[match(parents,used_opinions2$taxon_name)]);
 return(data.frame(cbind(taxa,parents,parent_ranks)));
@@ -2322,7 +2324,7 @@ accio_classification <- function(taxon,ranks)	{
 #http://www.paleobiodb.org/data1.2/taxa/list.csv?base_name=Lophospira&rank=genus,subgenus&private&show=class
 http1 <- paste("http://paleobiodb.org/data1.2/taxa/list.csv?base_name=",taxon,"&rank=",ranks,"&show=class",sep="")
 accio <- RCurl::getURL(http1)
-classification <- data.frame(utils::read.csv(text = accio, header = TRUE, stringsAsFactors=FALSE))
+classification <- data.frame(utils::read.csv(text = accio, header = TRUE, stringsAsFactors=FALSE,encoding="UTF-8"))
 return(classification)
 }
 
@@ -2446,7 +2448,7 @@ taxon <- gsub(" ","%20",taxon);
 httpT <- paste("http://paleobiodb.org/data1.2/taxa/list.csv?base_name=",taxon,"&show=full,immparent,classext,attr,app",sep="");
 ## If the taxon is absent, then something weird will happen: kill it with fire.
 accio <- RCurl::getURL(httpT);
-taxon_info <- data.frame(utils::read.csv(text = accio, header = TRUE, stringsAsFactors=FALSE));
+taxon_info <- data.frame(utils::read.csv(text = accio, header = TRUE, stringsAsFactors=FALSE,encoding="UTF-8"));
 if (ncol(taxon_info)<=2 || (taxon_info[1,1]=="THIS REQUEST RETURNED NO RECORDS" || taxon_info=="THIS.REQUEST.RETURNED.NO.RECORDS" || nrow(which(taxon_info=="THIS REQUEST RETURNED NO RECORDS",arr.ind = T))>0))	{
 #	ttl_finds <- rbind(ttl_finds,cbind(taxon_list[tx],0));
 	dud <- T;
@@ -2455,7 +2457,7 @@ if (ncol(taxon_info)<=2 || (taxon_info[1,1]=="THIS REQUEST RETURNED NO RECORDS" 
 		taxon <- strsplit(orig_taxon,split=" ")[[1]][1];
 		httpT <- paste("http://paleobiodb.org/data1.2/taxa/list.csv?base_name=",taxon,"&show=full,immparent,classext,attr,app",sep="");
 		accio <- RCurl::getURL(httpT);
-		taxon_info <- data.frame(utils::read.csv(text = accio, header = TRUE, stringsAsFactors=FALSE));
+		taxon_info <- data.frame(utils::read.csv(text = accio, header = TRUE, stringsAsFactors=FALSE,encoding="UTF-8"));
 		taxon_info <- taxon_info[match(taxon,taxon_info$taxon_name),];	# get rid of species & subgenera
 		if (nrow(which(taxon_info=="THIS REQUEST RETURNED NO RECORDS",arr.ind = T))==0)
 			dud <- F;
@@ -2463,7 +2465,7 @@ if (ncol(taxon_info)<=2 || (taxon_info[1,1]=="THIS REQUEST RETURNED NO RECORDS" 
 	if (dud)	{
 		httpTT <- paste("http://paleobiodb.org/data1.2/taxa/list.csv?base_name=Lophospira&show=full,immparent,classext,attr,app",sep="");
 		accioTT <- RCurl::getURL(httpTT);
-		dummy_info <- data.frame(utils::read.csv(text = accioTT, header = TRUE, stringsAsFactors=FALSE));
+		dummy_info <- data.frame(utils::read.csv(text = accioTT, header = TRUE, stringsAsFactors=FALSE,encoding="UTF-8"));
 #	output_labels <- c("orig_no","taxon_no","record_type","flags","taxon_rank","taxon_name","taxon_attr","difference","accepted_no","accepted_rank","accepted_name","parent_no","reference_no","is_extant","n_occs","firstapp_max_ma","firstapp_min_ma","lastapp_max_ma","lastapp_min_ma","early_interval","late_interval");
 		output_labels <- colnames(dummy_info);
 		taxon_info <- data.frame(matrix("",1,length(output_labels)),stringsAsFactors = FALSE);
@@ -2496,7 +2498,7 @@ taxon <- gsub(" ","%20",taxon);
 httpT <- paste("http://paleobiodb.org/data1.2/taxa/list.csv?base_name=",taxon,"&show=immparent",sep="");
 ## If the taxon is absent, then something weird will happen: kill it with fire.
 accio <- RCurl::getURL(httpT);
-taxon_info <- data.frame(utils::read.csv(text = accio, header = TRUE, stringsAsFactors=FALSE));
+taxon_info <- data.frame(utils::read.csv(text = accio, header = TRUE, stringsAsFactors=FALSE,encoding="UTF-8"));
 if (ncol(taxon_info)<=2 || (taxon_info[1,1]=="THIS REQUEST RETURNED NO RECORDS" || taxon_info=="THIS.REQUEST.RETURNED.NO.RECORDS"))	{
 #	ttl_finds <- rbind(ttl_finds,cbind(taxon_list[tx],0));
 	output_labels <- c("orig_no","taxon_no","record_type","flags","taxon_rank","taxon_name","taxon_attr","difference","accepted_no","accepted_rank","accepted_name","parent_no","reference_no","is_extant","n_occs","firstapp_max_ma","firstapp_min_ma","lastapp_max_ma","lastapp_min_ma","early_interval","late_interval");
@@ -2528,7 +2530,7 @@ taxon <- gsub(" ","%20",taxon);
 httpT <- paste("http://paleobiodb.org/data1.2/taxa/list.csv?base_name=",taxon,"&show=full",sep="");
 ## If the taxon is absent, then something weird will happen: kill it with fire.
 accio <- RCurl::getURL(httpT);
-taxon_info <- data.frame(utils::read.csv(text = accio, header = TRUE, stringsAsFactors=FALSE));
+taxon_info <- data.frame(utils::read.csv(text = accio, header = TRUE, stringsAsFactors=FALSE,encoding="UTF-8"));
 if (ncol(taxon_info)<=2 || (taxon_info[1,1]=="THIS REQUEST RETURNED NO RECORDS" || taxon_info=="THIS.REQUEST.RETURNED.NO.RECORDS"))	{
 #	ttl_finds <- rbind(ttl_finds,cbind(taxon_list[tx],0));
 	output_labels <- c("orig_no","taxon_no","record_type","flags","taxon_rank","taxon_name","taxon_attr","difference","accepted_no","accepted_rank","accepted_name","parent_no","reference_no","is_extant","n_occs","firstapp_max_ma","firstapp_min_ma","lastapp_max_ma","lastapp_min_ma","early_interval","late_interval");
@@ -2573,13 +2575,13 @@ for (tx in 1:ntaxa)	{
 	httpT <- paste("http://paleobiodb.org/data1.2/taxa/list.csv?base_name=",taxon,"&show=attr,app",sep="")
 	## If the taxon is absent, then something weird will happen: kill it with fire.
 	accio <- RCurl::getURL(httpT);
-	taxon_info <- data.frame(utils::read.csv(text = accio, header = TRUE, stringsAsFactors=FALSE))
+	taxon_info <- data.frame(utils::read.csv(text = accio, header = TRUE, stringsAsFactors=FALSE,encoding="UTF-8"))
 	if (ncol(taxon_info)<=2 || (taxon_info[1,1]=="THIS REQUEST RETURNED NO RECORDS" || taxon_info=="THIS.REQUEST.RETURNED.NO.RECORDS"))	{
 		ttl_finds <- rbind(ttl_finds,cbind(taxon_list[tx],0))
 		}	else	{
 		http <- paste("http://paleobiodb.org/data1.2/colls/list.csv?base_name=",taxon,"&show=full",sep="")
 		accio <- RCurl::getURL(http)
-		taxon_finds <- data.frame(utils::read.csv(text = accio, header = TRUE, stringsAsFactors=FALSE))
+		taxon_finds <- data.frame(utils::read.csv(text = accio, header = TRUE, stringsAsFactors=FALSE,encoding="UTF-8"))
 		if (nrow(taxon_finds)==1 && taxon_finds$collection_no=="THIS REQUEST RETURNED NO RECORDS")	{
 			n_occs <- 0
 			} else	{
@@ -2649,7 +2651,7 @@ i <- match(contrain_oldest,intervals)
 while (!good)	{
 	httpO <- paste("http://paleobiodb.org/data1.2/occs/list.csv?base_name=",taxon,"&interval=",intervals[i],"&show=stratext",sep = "")
 	fetch <- RCurl::getURL(httpO)
-	all_finds <- utils::read.csv(text = fetch, header = TRUE, stringsAsFactors=FALSE)
+	all_finds <- utils::read.csv(text = fetch, header = TRUE, stringsAsFactors=FALSE,encoding="UTF-8")
 	if(nrow(all_finds)==1 && all_finds[1]=="THIS REQUEST RETURNED NO RECORDS")	{
 		i <- i+1
 		}	else	{
@@ -2666,7 +2668,7 @@ if (abs(maxma-minma)<give_or_take && intervals[i]!="Cenozoic")	{
 	i<-i+1
 	httpO <- paste("http://paleobiodb.org/data1.2/occs/list.csv?base_name=",taxon,"&interval=",intervals[i],"&show=stratext",sep = "")
 	fetch <- RCurl::getURL(httpO)
-	new_finds <- utils::read.csv(text = fetch, header = TRUE, stringsAsFactors=FALSE)
+	new_finds <- utils::read.csv(text = fetch, header = TRUE, stringsAsFactors=FALSE,encoding="UTF-8")
 	new_spc_finds <- subset(new_finds,new_finds$identified_rank=="species")
 	elder <- rbind(elder,subset(new_spc_finds,new_spc_finds$max_ma>=(maxma-(maxma/give_or_take))))
 	}
@@ -2686,7 +2688,7 @@ i <- match(contrain_oldest,intervals)
 while (!good)	{
 	httpO <- paste("http://paleobiodb.org/data1.2/occs/list.csv?base_name=",taxon,"&interval=",intervals[i],"&show=stratext",sep = "")
 	fetch <- RCurl::getURL(httpO)
-	all_finds <- utils::read.csv(text = fetch, header = TRUE, stringsAsFactors=FALSE)
+	all_finds <- utils::read.csv(text = fetch, header = TRUE, stringsAsFactors=FALSE,encoding="UTF-8")
 	if(nrow(all_finds)==1 && all_finds[1]=="THIS REQUEST RETURNED NO RECORDS")	{
 		i <- i+1
 		}	else	{
@@ -2703,7 +2705,7 @@ if (abs(maxma-minma)<give_or_take && intervals[i]!="Cenozoic")	{
 	i<-i+1
 	httpO <- paste("http://paleobiodb.org/data1.2/occs/list.csv?base_name=",taxon,"&interval=",intervals[i],"&show=stratext",sep = "")
 	fetch <- RCurl::getURL(httpO)
-	new_finds <- utils::read.csv(text = fetch, header = TRUE, stringsAsFactors=FALSE)
+	new_finds <- utils::read.csv(text = fetch, header = TRUE, stringsAsFactors=FALSE,encoding="UTF-8")
 	new_spc_finds <- subset(new_finds,new_finds$identified_rank=="species")
 	elder <- rbind(elder,subset(new_spc_finds,new_spc_finds$max_ma>=(maxma-(maxma/give_or_take))))
 	}
@@ -3023,69 +3025,9 @@ web_text <- gsub("√©","e",web_text);
 #web_text <- gsub("ö","&ouml;",web_text);
 #web_text <- gsub("ü","&uuml;",web_text);
 web_text <- gsub("&#321;","L",web_text);
+web_text <- gsub("&#305;","i",web_text);
 web_text <- gsub("≈ç","o",web_text);
 web_text <- transmogrify_diacritics(funky_text=web_text);
-#web_text <- gsub("å","a",web_text);
-#web_text <- gsub("á","a",web_text);
-#web_text <- gsub("à","a",web_text);
-#web_text <- gsub("ä","a",web_text);
-#web_text <- gsub("â","a",web_text);
-#web_text <- gsub("ã","a",web_text);
-#web_text <- gsub("æ","ae",web_text);
-#web_text <- gsub("è","e",web_text);
-#web_text <- gsub("é","e",web_text);
-#web_text <- gsub("ë","e",web_text);
-#web_text <- gsub("ê","e",web_text);
-#web_text <- gsub("í","i",web_text);
-#web_text <- gsub("ì","i",web_text);
-#web_text <- gsub("ï","i",web_text);
-#web_text <- gsub("î","i",web_text);
-#web_text <- gsub("ó","o",web_text);
-#web_text <- gsub("ò","o",web_text);
-#web_text <- gsub("ô","o",web_text);
-#web_text <- gsub("ö","o",web_text);
-#web_text <- gsub("õ","o",web_text);
-#web_text <- gsub("ø","o",web_text);
-#web_text <- gsub("ř","r",web_text);
-#web_text <- gsub("ü","u",web_text);
-#web_text <- gsub("û","u",web_text);
-#web_text <- gsub("ú","u",web_text);
-#web_text <- gsub("ù","u",web_text);
-#web_text <- gsub("č","c",web_text);
-#web_text <- gsub("ç","c",web_text);
-#web_text <- gsub("ñ","n",web_text);
-#web_text <- gsub("ý","y",web_text);
-#web_text <- gsub("š","s",web_text);
-#web_text <- gsub("ž","z",web_text);
-#web_text <- gsub("Å","A",web_text);
-#web_text <- gsub("Á","A",web_text);
-#web_text <- gsub("À","A",web_text);
-#web_text <- gsub("Ä","A",web_text);
-#web_text <- gsub("Â","A",web_text);
-#web_text <- gsub("Ã","A",web_text);
-#web_text <- gsub("Æ","Ae",web_text);
-#web_text <- gsub("È","e",web_text);
-#web_text <- gsub("É","E",web_text);
-#web_text <- gsub("Ë","E",web_text);
-#web_text <- gsub("Ê","E",web_text);
-#web_text <- gsub("Í","I",web_text);
-#web_text <- gsub("Ì","I",web_text);
-#web_text <- gsub("Ï","I",web_text);
-#web_text <- gsub("Î","I",web_text);
-#web_text <- gsub("Ó","O",web_text);
-#web_text <- gsub("Ò","O",web_text);
-#web_text <- gsub("Ô","O",web_text);
-#web_text <- gsub("Ö","O",web_text);
-#web_text <- gsub("Õ","O",web_text);
-#web_text <- gsub("Ø","O",web_text);
-#web_text <- gsub("Ü","U",web_text);
-#web_text <- gsub("Û","U",web_text);
-#web_text <- gsub("Ú","U",web_text);
-#web_text <- gsub("Ù","U",web_text);
-#web_text <- gsub("Ç","C",web_text);
-#web_text <- gsub("Ñ","N",web_text);
-#web_text <- gsub("ý","y",web_text);
-#web_text <- gsub("ž","z",web_text);
 web_text <- gsub("√º","u",web_text);
 web_text <- gsub("√∫","u",web_text);
 web_text <- gsub("√Ω","y",web_text);
@@ -3206,6 +3148,8 @@ if (named_rock_unit=="")	{
 	named_rock_unit <- gsub("\'s ", "s ",named_rock_unit);
 	named_rock_unit <- gsub("’s ", "s ",named_rock_unit);
 	named_rock_unit <- gsub("\'", "’",named_rock_unit);
+	named_rock_unit <- gsub("“", "",named_rock_unit);
+	named_rock_unit <- gsub("”", "",named_rock_unit);
 	named_rock_unit <- gsub("\u009d","",named_rock_unit);
 	named_rock_unit <- gsub("\035","",named_rock_unit);
 	named_rock_unit <- gsub("\x8","",named_rock_unit);
@@ -3278,7 +3222,7 @@ if (named_rock_unit=="")	{
 		if (n_r_u[1]=="Mountain")	n_r_u[1] <- "Mount";
 		}
 
-	bad_words <- c("basal","bed","beds","biofacies","biozone","couches","facies","fm.","fm","formacion","formation","horizons","horizon","layer","level","member","mbr","mb","miembro","niveau","section","series","shelly","stage","suite","subst.","subsuite","subzone","tongue","unit","units","zone","bottom","top","(lower)","(middle)","(upper)","(bottom)","(top)","regional");
+	bad_words <- c("basal","bed","beds","biofacies","biozone","couches","facies","fm.","fm","formacion","formation","horizons","horizon","layer","level","lagoonal","member","mbr","mb","miembro","niveau","section","series","shelly","stage","standard","suite","subst.","subsuite","subzone","tongue","unit","units","zone","bottom","top","(lower)","(middle)","(upper)","(bottom)","(top)","regional");
 	uncensored <- (1:rock_names)[!tolower(n_r_u) %in% bad_words];
 	
 	named_rock_unit <- paste(n_r_u[uncensored],collapse = " ");
@@ -3463,9 +3407,16 @@ zone_molecularized <- zone_molecularized[zone_molecularized!=""];
 while (zone_molecularized[length(zone_molecularized)]=="-")
 	zone_molecularized <- zone_molecularized[1:(length(zone_molecularized)-1)];
 zone <- paste(zone_molecularized, collapse = " ");
-	
+#Cf5 + Cf6
 zone <- gsub("  "," ",zone);
 zone <- gsub("  "," ",zone);
+#zone <- gsub("\xd3","",zone) √
+#zone <- gsub("\xd2","",zone)
+zone <- gsub("≈í¬±","α",zone);
+zone <- gsub("√ü","ß",zone);
+zone <- gsub("‚àö√º","ß",zone);
+zone <- gsub("≈í‚â•","γ",zone);
+zone <- gsub("≈í¬•","δ",zone);
 zone <- gsub(" (\\?)","",zone);
 zone <- gsub("(\\?)","",zone);
 zone <- gsub(" \\?"," ",zone);
@@ -3498,7 +3449,7 @@ zone <- gsub("lower - upper ","",zone);
 #zone <- gsub("- " ,"-",zone);
 
 if (zone != "")	{
-	zone_detritus <- c("biozone","zone","zones","subzone","subzones","level","levels","bed","beds","layer","fauna","interval","local","total","range","ammonite","trilobite","conodont","coral","graptolite","reference","base","max:","min:","close","between","of","the","spore","assemblage","part","s.l.","s.l.\\)","(s.l.\\)","concurrent");
+	zone_detritus <- c("biozone","zone","zones","subzone","subzones","level","levels","bed","beds","layer","fauna","interval","local","total","range","ammonite","goniatite","trilobite","conodont","coral","graptolite","reference","base","max:","min:","close","between","of","the","spore","assemblage","part","s.l.","s.l.\\)","(s.l.\\)","concurrent");
 	zone_molecularized <- strsplit(zone," ")[[1]];
 	zone_molecularized[zone_molecularized %in% c("or","and","to","through")] <- "-";
 	molecules <- (1:length(zone_molecularized))[!tolower(zone_molecularized) %in% zone_detritus];
@@ -3530,6 +3481,8 @@ if (zone != "")	{
 					}
 				}
 			}
+		if (zone_molecularized[molecules[length(molecules)]]=="-")
+			molecules <- molecules[1:(length(molecules)-1)];
 		zone <- paste(zone_molecularized[molecules], collapse = " ");
 		if (zone_molecularized[1]=="MN" || zone_molecularized[1]=="MP")	{
 			breakpts <- (1:length(zone_molecularized))[zone_molecularized %in% "-"];
@@ -3564,6 +3517,7 @@ return(zone);
 
 # Separate "Redlichia chinensis - Kootenia gimmelfarbi" into "Redlichia chinensis" & "Kootenia gimmelfarbi"
 diffindo_zone <- function(zone)	{
+zone <- gsub("\\+","-",zone);			# added 2019-12-10
 zone <- gsub("–","-",zone);
 zone <- gsub(" -" ,"-",zone);
 zone <- gsub("- " ,"-",zone);
@@ -3881,8 +3835,16 @@ if (length(editted_colls)!=length(colls_to_edit))	{
 for (ef in 1:length(editted_fields))	{
 	if (editted_fields[ef]!="collection_no")	{
 		field_to_edit <- match(editted_fields[ef],colnames(paleodb_collections));
-		length(paleodb_collections[colls_to_edit,field_to_edit]) <- length(paleodb_collection_edits[editted_colls,ef]);
-		paleodb_collections[colls_to_edit,field_to_edit] <- paleodb_collection_edits[editted_colls,ef];
+		if (is.na(field_to_edit))	{
+			relv_col_no <- match(editted_fields[ef],colnames(paleodb_collection_edits));
+			dummy <- array("",dim=c(nrow(paleodb_collections),1));
+			colnames(dummy) <- editted_fields[ef];
+			dummy[colls_to_edit,1] <- paleodb_collection_edits[editted_colls,ef];
+			paleodb_collections <- cbind(paleodb_collections,dummy);
+			} else	{
+#			length(paleodb_collections[colls_to_edit,field_to_edit]) <- length(paleodb_collection_edits[editted_colls,ef]);
+			paleodb_collections[colls_to_edit,field_to_edit] <- paleodb_collection_edits[editted_colls,ef];
+			}
 #		cbind(paleodb_collections[colls_to_edit,field_to_edit],paleodb_collection_edits[editted_colls,2]);
 		}
 	}
@@ -3890,10 +3852,18 @@ return(paleodb_collections);
 }
 
 	##### ROUTINES TO ORGANIZE PALEODB DATA WITH EXTERNAL DATABASE ######
+# add something so that if a range of zones is given and some exceed rocks' zones...
+#	then discard those zones.
 # routine to convert intervals to some standardized chronostratigraphic scale (e.g., international unts)
 reset_paleodb_intervals_to_desired_time_scale <- function(collections,finest_chronostrat,time_scale)	{
 ncolls <- nrow(collections);
-collections$late_interval[collections$late_interval==""] <- collections$early_interval[collections$late_interval==""];
+collections$early_interval <- as.character(collections$early_interval);
+collections$late_interval <- as.character(collections$late_interval);
+single_bins <- sort(c((1:ncolls)[is.na(collections$late_interval)],(1:ncolls)[collections$late_interval==""]));
+collections$late_interval[single_bins] <- collections$early_interval[single_bins]
+#for (sb in 1:length(single_bins))
+#	collections$late_interval[single_bins[sb]] <- collections$early_interval[single_bins[sb]];
+#collections$late_interval[collections$late_interval==""] <- collections$early_interval[collections$late_interval==""];
 problem_early_intervals <- (1:ncolls)[is.na(match(collections$early_interval,finest_chronostrat$interval))];
 problem_late_intervals <- (1:ncolls)[is.na(match(collections$late_interval,finest_chronostrat$interval))];
 pei <- 0;
@@ -4444,7 +4414,11 @@ return(cbind(entered_formations,entered_members));
 refine_collection_dates_with_external_database <- function(study="",collections,rock_database,zone_database,rock_to_zone_database,time_scale,directory="",save_files=TRUE,output_type=".csv")	{
 n_rocks <- nrow(rock_database);
 
-redone_collections <- match_paleodb_collections_to_external_stratigraphic_database(collections,rock_database);
+collections$formation <- as.character(collections$formation);
+collections$member <- as.character(collections$member);
+collections$stratgroup <- as.character(collections$stratgroup);
+
+redone_collections <- match_paleodb_collections_to_external_stratigraphic_database(collections,wagner_rocks=rock_database);
 ncoll <- nrow(redone_collections);
 #lost_time <- (1:ncoll)[!redone_collections$early_interval %in% timey_wimey$interval]
 #redone_collections$early_interval[lost_time]
@@ -4844,8 +4818,8 @@ if (save_files)	{
 		output2 <- paste(directory,output2,sep="");
 		}
 	if (output_type==".csv")	{
-		write.csv(redone_collections,output1,row.names=FALSE);
-		write.csv(untraceable_zone_information,output2,row.names=FALSE);
+		write.csv(redone_collections,output1,row.names=FALSE,fileEncoding="UTF-8");
+		write.csv(untraceable_zone_information,output2,row.names=FALSE,fileEncoding="UTF-8");
 		} else	{
 		write.table(redone_collections,output1,row.names=FALSE,col.names=TRUE,sep="\t");
 		write.table(untraceable_zone_information,output2,row.names=FALSE,col.names=TRUE,sep="\t");
@@ -4863,7 +4837,7 @@ organize_rock_data_for_paleodb_matching	<- function(external_strat_database)	{
 if (external_strat_database!="")	{
 	file_type <- specialis_revelio_file_type(filename = external_strat_database);
 	if (file_type=="csv")	{
-		wagner_rocks <- read.csv(file=external_strat_database,header=TRUE,stringsAsFactors=FALSE);
+		wagner_rocks <- read.csv(file=external_strat_database,header=TRUE,stringsAsFactors=FALSE,encoding="UTF-8");
 		}	else	{
 		wagner_rocks <- read.table(file=rock_unit_database,header=TRUE,stringsAsFactors=FALSE,sep="\t");
 		}
@@ -5241,7 +5215,7 @@ if (sum(paleodb_collections$rock_no_sr)==0)	{
 		gp <- gp+1;
 		this_plate <- (1:nrow(paleodb_collections))[as.numeric(paleodb_collections$geoplate)==geoplates[gp]];
 		paleodb_collections$rock_no_sr[this_plate] <- paleodb_collections$rock_no[this_plate] <- gp+mx_rock_no;
-		paleodb_collections$formation_no_sr[this_plate] <- paleodb_collections$formation_no[this_plate] <- gp+mx_rock_no;
+		paleodb_collections$formation_no[this_plate] <- paleodb_collections$formation_no[this_plate] <- gp+mx_rock_no;
 		}
 	}
 
@@ -5268,9 +5242,9 @@ zd <- nrow(zone_data);
 
 zone <- zone_data$zone;
 zone_species <- sapply(zone,transmogrify_full_zone_names_to_species_names_only);
-#for (zz in 1:length(zone))	{
+#for (zz in 1:length(zone))	
 #	transmogrify_full_zone_names_to_species_names_only(zone[zz]);
-#	}
+#	
 Nontaxon_Zone <- raster::t(sapply(zone,aparecium_nontaxon_zone));
 rownames(Nontaxon_Zone) <- NULL;
 Nontaxon_Zone <- data.frame(non_taxon_zone=as.character(Nontaxon_Zone[,1]),non_taxon_zone_label=as.character(Nontaxon_Zone[,2]),stringsAsFactors = F);
@@ -5321,7 +5295,7 @@ for (zgs in 1:nrow(zone_genera_subgenera))	{
 	}
 zone_epithet_sr <- sapply(zone,transmogrify_full_zone_names_to_species_names_only);
 new_zone_info <- data.frame(zone_species=as.character(zone_species),zone_species_sr=as.character(zone_species_sr),non_taxon_zone=as.character(Nontaxon_Zone$non_taxon_zone),non_taxon_zone_label=as.character(Nontaxon_Zone$non_taxon_zone_label),non_taxon_zone_sr=as.character(Nontaxon_zone_sr$non_taxon_zone_sr),non_taxon_zone_label_sr=as.character(Nontaxon_zone_sr$non_taxon_zone_label_sr),
-	genus_speccies_combo=as.character(new_zone_combos[,1]),subgenus_species_combo=as.character(new_zone_combos[,2]),zone_epithet=as.character(zone_epithet),zone_epithet_sr=as.character(zone_epithet_sr),abbreviated_zone=as.character(abbreviated_zone),stringsAsFactors = F);
+	genus_species_combo=as.character(new_zone_combos[,1]),subgenus_species_combo=as.character(new_zone_combos[,2]),zone_epithet=as.character(zone_epithet),zone_epithet_sr=as.character(zone_epithet_sr),abbreviated_zone=as.character(abbreviated_zone),stringsAsFactors = F);
 #colnames(new_zone_combos) <- c("Genus_species_combo","Subgenus_species_combo","zone_epithet","zone_epithet_sr","abbreviated_zone");
 zone_data <- cbind(zone_data,new_zone_info);
 rownames(zone_data) <- NULL;
@@ -5337,15 +5311,7 @@ paleodb_collections$zone[coll_w_zones] <- sapply(zone,turgio_zone);
 zone_species <- array("",dim=ncolls);
 zone_species[coll_w_zones] <- sapply(zone,transmogrify_full_zone_names_to_species_names_only);
 paleodb_collections <- tibble::add_column(paleodb_collections,zone_species,.after="zone");
-#for (zz in 1:length(zone))	{
-#	transmogrify_full_zone_names_to_species_names_only(zone[zz]);
-#	}
-#Nontaxon_Zone <- raster::t(sapply(zone,aparecium_nontaxon_zone));
-#rownames(Nontaxon_Zone) <- NULL;
-#Nontaxon_Zone <- data.frame(Nontaxon_Zone);
-
-#zone_data <- cbind(zone_data,zone_species,zone_species_sr,Nontaxon_Zone,Nontaxon_zone_sr);
-return(zone_data);
+return(paleodb_collections);
 }
 #paleodb_zone_info <- match_collections_zones_to_zone_database(collections,zone_database);
 
@@ -5761,14 +5727,23 @@ return(output);
 match_paleodb_collections_to_external_stratigraphic_database <- function(collections,wagner_rocks)	{
 
 n_rocks <- nrow(wagner_rocks);
-### quick kluge for John....
-#entered_rock_and_onsets <-cbind(collections$formation,collections$member,collections$max_ma);
-#turgio_rocks <- paleodb_editing_kluges(entered_rock_and_onsets);
-#collections$formation <- turgio_rocks[,1];
-#collections$member <- turgio_rocks[,2];
-### some day I won't need this..... :-(
-### today is that day! :-)
+clean_formations <- wagner_rocks$formation;
+named_rock_unit <- wagner_rocks$formation[wagner_rocks$formation!=""];
+clean_formations[wagner_rocks$formation!=""] <- sapply(named_rock_unit,scourgify_rock_unit_names,dehyphenate=TRUE,delete_rock_type=FALSE,delete_informal=FALSE);
+unique_formations <- sort(unique(clean_formations[clean_formations!=""]));
+rock_units <- wagner_rocks$formation;
+membered <- (1:n_rocks)[wagner_rocks$member!=""];
+rock_units[membered] <- paste(wagner_rocks$formation[membered]," (",wagner_rocks$member[membered],")",sep="");
 
+homonym_rocks <- subset(wagner_rocks,wagner_rocks$rock_no<1);
+for (uf in 1:length(unique_formations))	{
+	if (sum(wagner_rocks$full_name %in% unique_formations[uf])>1)	{
+		xxx <- which(unique_formations[uf]==rock_units,arr.ind=TRUE);
+		homonym_rocks <- rbind(homonym_rocks,wagner_rocks[xxx,]);
+		}
+	}
+
+#rock_units[wagner_rocks$formation=="Haverford Mudstone"]
 ### Now, take PaleoDB collections and match them to external database
 # separate collections with different types of stratigraphic information
 n_coll <- nrow(collections);
@@ -6303,8 +6278,44 @@ while (cc<n_i_s)	{
 	}
 
 # I've had it: I'm going Arya on any last undated collections!!!!
-ma_lb[ma_lb==0] <- as.numeric(collections$max_ma[ma_lb==0]);
-ma_ub[ma_ub==0] <- as.numeric(collections$min_ma[ma_ub==0]);
+collections$max_ma <- as.numeric(collections$max_ma);
+collections$min_ma <- as.numeric(collections$min_ma);
+ncolls <- nrow(collections);
+# I do not know why this is needed; a mystery NA appears if I just set the vectors equal
+#ma_lb[ma_lb==0] <- as.numeric(collections$max_ma[ma_lb==0]);
+#ma_ub[ma_ub==0] <- as.numeric(collections$min_ma[ma_ub==0]);
+undated <- (1:ncolls)[ma_lb==0];
+for (ud in 1:length(undated))
+	ma_lb[undated[ud]] <- as.numeric(collections$max_ma[undated[ud]]);
+undated <- (1:ncolls)[ma_ub==0];
+for (ud in 1:length(undated))
+	ma_ub[undated[ud]] <- as.numeric(collections$min_ma[undated[ud]]);
+
+homonym_names <- unique(homonym_rocks$formation);
+for (hr in 1:length(homonym_names))	{
+	these_cases <- subset(homonym_rocks,homonym_rocks$formation==homonym_names[hr])
+	cases <- unique(c((1:ncolls)[paleodb_clean_rock_unit_no_rock_formal %in% homonym_names[hr]],
+			(1:ncolls)[paleodb_clean_rock_unit_no_rock %in% homonym_names[hr]],
+			(1:ncolls)[paleodb_clean_rock_unit_basic %in% homonym_names[hr]]));
+	if (length(unique(these_cases$geoplate))==nrow(these_cases))	{
+		ddd <- match(as.numeric(collections$geoplate[cases]),these_cases$geoplate);
+		if (sum(is.na(ddd))>0)	{
+			eee <- ddd[is.na(ddd)];
+			}
+		cases <- cases[!is.na(ddd)];
+		ddd <- ddd[!is.na(ddd)];
+		rock_no[cases] <- these_cases$rock_no[ddd];
+		rock_no_sr[cases] <- these_cases$rock_no_sr[ddd];
+		formation_no[cases] <- these_cases$formation_no[ddd];
+		interval_lb[cases] <- these_cases$interval_lb[ddd];
+		interval_ub[cases] <- these_cases$interval_ub[ddd];
+		ma_lb[cases[ma_lb[cases]>these_cases$ma_lb[ddd]]] <- these_cases$ma_lb[ddd[ma_lb[cases]>these_cases$ma_lb[ddd]]];
+		ma_ub[cases[ma_ub[cases]<these_cases$ma_ub[ddd]]] <- these_cases$ma_ub[ddd[ma_ub[cases]<these_cases$ma_ub[ddd]]];
+		} else	{
+		### do something here, Pete!
+		}
+	}
+
 interval_lb[interval_lb=="?"] <- as.character(collections$early_interval[interval_lb=="?"]);
 interval_ub[interval_ub=="?"] <- as.character(collections$late_interval[interval_ub=="?"]);
 redone_collections <- cbind(collections,rock_no_sr,rock_no,formation_no,rock_unit_senior,rock2_no_sr,rock2_no,formation2_no,rock_unit_senior2,ma_lb,ma_ub,interval_lb,interval_ub,clean_match);

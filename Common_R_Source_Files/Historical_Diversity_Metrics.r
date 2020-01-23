@@ -509,7 +509,7 @@ return(phi1s)
 # prec: how finely you want the timescale, with 1 = 1 million years
 
 # rewritten 2017-06-14 after talking with Mark & Curtis.  I rock.
-prob_sampling_paraclade_unknown_size_per_time_step <- function(p,q,r,bs,prec,per_ma=TRUE) {
+prob_sampling_paraclade_unknown_size_per_time_step <- function(p,q,r,bs,prec,per_ma=T) {
 # p: interval origination rate
 # q: interval extinction rate
 # r: interval sampling rate
@@ -606,8 +606,8 @@ return(phi)
 
 # written 2017-06-14 after talking with Mark & Curtis.  I probably have this somewhere already
 prob_sampled_branching_per_time_step <- function(p,q,r,bs,prec)	{
-phi_sl <- prob_sampling_paraclade_unknown_size_per_time_step(p,q,r,bs,prec)
-pp <- assign_interval_rates_to_finer_time_scale(bin_rates=p,bs,prec)
+phi_sl <- prob_sampling_paraclade_unknown_size_per_time_step(p,q,r,bs,prec);
+pp <- assign_interval_rates_to_finer_time_scale(bin_rates=p,bs,prec);
 ppp <- 1-dpois(0,prec*pp)	# p branching over time=prec give expectation of p over time=1
 return(phi_sl*ppp)	# probability of branching x probability that branching is sampled
 }
@@ -1010,9 +1010,9 @@ prob_n_species_at_time_tm <- function(n,a,p,q,chrons)  {
 #	after time chrons; from Raup 1985
 #print(c(n,a))
 if (p==0 && q==0)	{
-	pn <- 1.0
+	pn <- 1.0;
 	}	else if (n>0 && q==0)	{
-	pn <- prob_n_species_at_time_tm_pure_birth(n,a,p,chrons)
+	pn <- prob_n_species_at_time_tm_pure_birth(n,a,p,chrons);
 	} else if (n==0)	{
 	pn <- prob_paraclade_extinction(a,p,q,chrons)
 	} else {
@@ -1026,17 +1026,25 @@ if (p==0 && q==0)	{
 			}	else {
 			# Raup 1985 Eq. A15
 			# prob of n species given 1 initial species & p=q
-			pn <- ((p*chrons)^(n-1))/((1+(p*chrons))^(n+1))
+			pn <- ((p*chrons)^(n-1))/((1+(p*chrons))^(n+1));
 			}	# end case where turnover rates are unequal and we start with 1.  This should be the most commonly used
 		}	else {
-		pt <- 0
+		pt2 <- pt <- 0
+		pts_p <- pts <- pt2s <- c();
 		if (p!=q)	{
 			# Raup 1985 Eq. A13
-			alpha <- prob_paraclade_extinction(1,p,q,chrons)
-			beta <- alpha*(p/q)
+			alpha <- prob_paraclade_extinction(1,p,q,chrons);
+			beta <- alpha*(p/q);
 			# Raup 1985 Eq. A16 pt 2
-			for (j in 0:min(a,n))
-				pt <- pt+(choose(a,j)*choose((a+n-j-1),(a-1))*(alpha^(a-j))*(beta^(n-j))*((1-alpha-beta)^j))
+			for (j in 0:min(a,n))	{
+				pt2s <- c(pt2s,(choose_with_logs(a,j)*choose_with_logs((a+n-j-1),(a-1))*(alpha^(a-j))*(beta^(n-j))*((1-alpha-beta)^j)));
+				pt2 <- pt2+    (choose_with_logs(a,j)*choose_with_logs((a+n-j-1),(a-1))*(alpha^(a-j))*(beta^(n-j))*((1-alpha-beta)^j));
+				pt3 <- log(choose_with_logs(a,j))+log(choose_with_logs(n-1,j-1))+(a-j)*log(alpha)+(n-j)*log(beta)+j*log((1-alpha)*(1-beta));
+				pts <- c(pts,(choose(a,j)*choose((a+n-j-1),(a-1))*(alpha^(a-j))*(beta^(n-j))*((1-alpha-beta)^j)));
+				pt <- pt+    (choose(a,j)*choose((a+n-j-1),(a-1))*(alpha^(a-j))*(beta^(n-j))*((1-alpha-beta)^j));
+				pts_p <- c(pts_p,pt);
+				pts_p3 <- c(pts_p3,pt3);
+				}
 			pn <- pt
 			}	else {
 			# case with equal extinction & origination rates

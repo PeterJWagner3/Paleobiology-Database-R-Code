@@ -284,3 +284,27 @@ file_type <- c();
 for (i in f_i_s:f_i)	file_type <- paste(file_type,file_info[i],sep="");
 return(file_type);
 }
+
+# transform dataframe into a list based on some criterion.
+#	list_criterion gives the column name with the variables that will be used to divide the data.frame into a list
+listifor <- function(dataframe_to_transform,list_criterion)	{
+criterion_col <- match(list_criterion,colnames(dataframe_to_transform));
+list_categories <- sort(unique(dataframe_to_transform[,criterion_col]));
+list_categories <- list_categories[list_categories!=""];
+
+listed_dataframe <- list();
+for (lc in 1:length(list_categories))	{
+	this_subset <- subset(dataframe_to_transform,dataframe_to_transform[,criterion_col]==list_categories[lc]);
+	listed_dataframe <- rlist::list.append(listed_dataframe,this_subset);
+	}
+names(listed_dataframe) <- list_categories;
+return(listed_dataframe);
+}
+
+choose_with_logs <- function(N,n)	{
+if (n==0 || n==N)	{
+	return(1);
+	} else	{
+	return(exp(sum(log(1:N))-(sum(log(1:n))+sum(log(1:(N-n))))));
+	}
+}
