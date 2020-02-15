@@ -308,3 +308,17 @@ if (n==0 || n==N)	{
 	return(exp(sum(log(1:N))-(sum(log(1:n))+sum(log(1:(N-n))))));
 	}
 }
+
+
+delete_row_from_matrix <- function(matrx,rw)	{
+if (rw==1)	{
+	return(matrx[2:nrow(matrx),])
+	} else if (rw==nrow(matrx))	{
+	return(matrx[1:(nrow(matrx)-1),])
+	} else	{
+	z <- rw+1;
+	new_matrx <- matrx[1:(rw-1),];
+	new_matrx <- rbind(new_matrx,matrx[(rw+1):nrow(matrx),]);
+	return(new_matrx);
+	}
+}

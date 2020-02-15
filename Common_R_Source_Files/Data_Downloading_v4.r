@@ -14,6 +14,8 @@ library(prodlim);
 taxonomic_rank <- c("subspecies","species","subgenus","genus","tribe","subfamily","family");
 uncertains <- c("?","cf.","aff.","ex_gr.");
 hell_no <- F;
+missing_taxon_assignment <- c("NP","NO","NC","NF","");
+paleodb_numeric_fields <- c("no","ma","size","occs");
 
 					##### ROUTINES TO DOWNLOAD DATA USING API #######
 # get occurrences for a taxon from some span of time & environment
@@ -221,6 +223,16 @@ if (!is.na(match("THIS REQUEST RETURNED NO RECORDS",fetched)))	{
 				}
 			}
 		}	
+	for (cn in 1:ncol(desired_finds))	{
+		old_info <- desired_finds[,cn];
+		cnm <- strsplit(x=colnames(desired_finds)[cn],split="_")[[1]];
+		if(cnm[length(cnm)] %in% paleodb_numeric_fields)	{
+			old_info[old_info %in% missing_taxon_assignment] <- 0;
+			desired_finds[,cn] <- as.numeric(old_info);
+			} else	{
+			desired_finds[,cn] <- as.character(old_info);
+			}
+		}
 	return(desired_finds);
 	}
 }
@@ -648,6 +660,20 @@ if (save_files)	{
 		write.csv(collections,file=output,row.names = FALSE,fileEncoding = "UTF-8");
 		}	else	{
 		write.table(collections,file=output,sep = "\t",row.names = FALSE,col.names = TRUE);
+		}
+	}
+for (cn in 1:ncol(collections))	{
+#cn <- 0;
+#while (cn<ncol(collections))	{
+#	cn <- cn+1;
+#	print(cn);
+	old_info <- collections[,cn];
+	cnm <- strsplit(x=colnames(collections)[cn],split="_")[[1]]
+	if(cnm[length(cnm)] %in% paleodb_numeric_fields && colnames(collections)[cn]!="collection_size")	{
+		old_info[old_info %in% missing_taxon_assignment] <- 0;
+		collections[,cn] <- as.numeric(old_info)
+		} else	{
+		collections[,cn] <- as.character(old_info);
 		}
 	}
 return(collections)

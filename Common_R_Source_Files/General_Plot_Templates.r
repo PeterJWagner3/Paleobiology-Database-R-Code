@@ -1293,7 +1293,7 @@ if (min_break!=0)	{
 	}
 }
 
-specified_axis_w_labels <- function(axe,max_val,min_val,maj_break,med_break,min_break,axis_labels,linewd=4/3,orient=1)	{
+specified_axis_w_labels <- function(axe,max_val,min_val,maj_break,med_break=0,min_break=0,axis_labels,axis_label_pts=NULL,axis_label_size=1,linewd=4/3,orient=1)	{
 axis(axe,at=seq(min_val,max_val,by=max_val-min_val),tcl=-0.0,labels = FALSE,lwd=linewd,las=orient);
 #if ((min_val/maj_break)-floor(min_val/maj_break)<(10^-10))	{
 	# this is a kluge necessitated by tiny rounding errors....
@@ -1320,7 +1320,10 @@ if (min_break!=0)	{
 	axis(axe,at=ticks,tcl=tck_sz,labels=FALSE,lwd=0.0,lwd.ticks=linewd,las=orient)
 	}
 #axis(axe,at=axis_labels,tcl=-0.30,labels=TRUE,lwd=0.0,lwd.ticks=0.0,las=orient)
-axis(axe,at=seq(min_val,max_val,by=maj_break),tcl=-0.30,labels=axis_labels,lwd=0.0,lwd.ticks=0.0,las=orient);
+if(is.numeric(axis_labels[1]) && is.null(axis_label_pts))	{
+	axis_label_pts <- axis_labels;
+	}
+axis(axe,at=axis_label_pts,tcl=-0.30,labels=axis_labels,lwd=0.0,lwd.ticks=0.0,las=orient,cex.axis=axis_label_size);
 }
 
 specified_right_y_axis <- function(mxy1,mny1,max_val,min_val,maj_break,med_break,min_break,linewd=4/3,orient=2,print_label=TRUE)	{
